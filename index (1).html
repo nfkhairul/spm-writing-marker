@@ -1,0 +1,1716 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Band Rail — SPM Writing Paper 2 Marker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#101334;
+  --ink-2:#2b3060;
+  --mist:#6a7099;
+  --paper:#eef1f8;
+  --card:#ffffff;
+  --line:#dde2f0;
+  --cyan:#12a8cf;      /* SPM cover cyan */
+  --p1:#1e9ee8;        /* Part 1 window (manual: blue) */
+  --p2:#5fbb3f;        /* Part 2 window (manual: green) */
+  --p3:#e8382c;        /* Part 3 window (manual: red) */
+  --mango:#ffb020;
+  --plum:#7a3ff2;
+  --ok:#159f6b;
+  --shadow:0 2px 0 rgba(16,19,52,.06), 0 14px 34px -18px rgba(16,19,52,.45);
+  --r:18px;
+  --display:"Space Grotesk","Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);color:var(--ink);background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 420px at 108% -8%, rgba(18,168,207,.18), transparent 60%),
+    radial-gradient(760px 380px at -10% 4%, rgba(122,63,242,.14), transparent 62%);
+  background-attachment:fixed;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{font-family:var(--display);margin:0;letter-spacing:-.02em;line-height:1.08}
+.mono{font-family:var(--mono)}
+
+/* ---------- shell ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;
+  padding:12px 18px;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.brand b{font-family:var(--display);font-size:17px;letter-spacing:-.03em;white-space:nowrap}
+.brand small{display:block;font-size:11px;color:var(--mist);letter-spacing:.14em;text-transform:uppercase}
+.nav{display:flex;gap:6px}
+.nav button{
+  border:1px solid transparent;background:transparent;border-radius:999px;
+  padding:9px 15px;font-size:14px;font-weight:600;color:var(--mist);cursor:pointer;transition:.16s;
+}
+.nav button:hover{color:var(--ink);background:#fff}
+.nav button[aria-current="true"]{background:var(--ink);color:#fff}
+.who{display:flex;align-items:center;gap:9px;padding-left:6px;border-left:1px solid var(--line)}
+.avatar{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-family:var(--display);
+  font-size:14px;color:#fff;background:linear-gradient(140deg,var(--plum),var(--cyan))}
+.who span{font-size:12px;color:var(--mist);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:1140px;margin:0 auto;padding:26px 18px 90px}
+.view{display:none;animation:rise .32s cubic-bezier(.2,.8,.3,1)}
+.view.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- primitives ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:20px}
+.grid{display:grid;gap:16px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.btn{
+  border:0;border-radius:13px;padding:13px 20px;font-weight:600;font-size:15px;cursor:pointer;
+  background:var(--ink);color:#fff;transition:.16s;display:inline-flex;align-items:center;gap:9px;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px -14px rgba(16,19,52,.9)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.tone{background:linear-gradient(120deg,var(--plum),var(--cyan));}
+.btn.sm{padding:9px 14px;font-size:13.5px;border-radius:11px}
+.btn.danger{background:#fff;color:#c02a20;border:1px solid #f0cdca}
+label.f{display:block;margin-bottom:14px}
+label.f > span{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+input[type=text],input[type=email],select,textarea{
+  width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fbfcff;transition:.16s
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(18,168,207,.16);background:#fff}
+:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.hint{font-size:12.5px;color:var(--mist);line-height:1.5}
+.tagP1{color:var(--p1)} .tagP2{color:var(--p2)} .tagP3{color:var(--p3)}
+
+/* ---------- sign in ---------- */
+.gate{max-width:1040px;margin:0 auto;padding:30px 18px;display:grid;gap:26px;grid-template-columns:1.05fr .95fr;align-items:center;min-height:100vh}
+@media(max-width:860px){.gate{grid-template-columns:1fr;min-height:auto;padding-top:22px}}
+.gate h1{font-size:clamp(34px,6vw,54px);line-height:.98}
+.gate h1 em{font-style:normal;background:linear-gradient(120deg,var(--plum),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.gate p.lede{color:var(--ink-2);font-size:16px;line-height:1.6;max-width:46ch}
+.marks{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.marks div{font-family:var(--mono);font-size:12px;padding:7px 11px;border-radius:9px;background:#fff;border:1px solid var(--line)}
+
+/* ---------- signature: the band rail ---------- */
+.rail{display:flex;gap:16px;align-items:stretch}
+.railwrap{background:linear-gradient(180deg,#fff,#f7f9ff);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+
+/* ---------- stats ---------- */
+.tiles{display:grid;gap:14px;grid-template-columns:repeat(4,1fr)}
+@media(max-width:820px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{padding:16px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tile b{display:block;font-family:var(--display);font-size:32px;letter-spacing:-.04em;margin-top:4px}
+.tile i{position:absolute;right:-14px;bottom:-18px;width:78px;height:78px;border-radius:50%;opacity:.13}
+.two{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:12px;border-bottom:1px solid #f0f3fa}
+tbody tr{cursor:pointer;transition:.12s}
+tbody tr:hover{background:#f7f9ff}
+.pill{display:inline-block;font-family:var(--mono);font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:8px}
+
+/* ---------- capture ---------- */
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.step{flex:1;min-width:120px;padding:11px 13px;border-radius:13px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;color:var(--mist);display:flex;align-items:center;gap:9px}
+.step u{font-family:var(--mono);width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--paper);font-size:11px;text-decoration:none}
+.step.now{color:#fff;background:var(--ink);border-color:var(--ink)}
+.step.now u{background:rgba(255,255,255,.2)}
+.step.done{color:var(--ok);border-color:#bfe5d5;background:#f2fbf7}
+.drop{border:2px dashed #c9d2e8;border-radius:16px;padding:20px;text-align:center;background:#fbfcff;transition:.16s}
+.drop.has{border-style:solid;border-color:var(--ok);background:#f4fbf8}
+.shots{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.shot{position:relative;width:92px;height:92px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot button{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:7px;border:0;background:rgba(16,19,52,.78);color:#fff;cursor:pointer;font-size:13px;line-height:1}
+.partcard{border-top:5px solid var(--c);}
+@media(max-width:700px){#dropGrid,.resgrid{grid-template-columns:1fr!important}}
+
+/* ---------- score display ---------- */
+.scorerow{display:grid;grid-template-columns:118px 1fr 40px;gap:12px;align-items:center;margin-bottom:11px}
+.meter{height:12px;border-radius:999px;background:#eef1f8;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:999px;transition:width .8s cubic-bezier(.2,.8,.3,1)}
+.scorerow b{font-family:var(--mono);font-size:17px;text-align:right}
+.dots{display:flex;gap:4px}
+.dots i{width:9px;height:9px;border-radius:3px;background:#e3e8f5}
+.big{font-family:var(--display);font-size:52px;letter-spacing:-.045em;line-height:1}
+.big small{font-size:18px;color:var(--mist);letter-spacing:0}
+
+.accordion{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.accordion summary{padding:13px 15px;cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;gap:10px;background:#fbfcff}
+.accordion summary::-webkit-details-marker{display:none}
+.accordion .body{padding:0 15px 15px;font-size:14px;line-height:1.6;color:var(--ink-2)}
+.quote{background:#fbfcff;border-left:3px solid var(--line);padding:8px 12px;border-radius:0 10px 10px 0;font-size:13.5px;margin:8px 0}
+
+ul.tick{list-style:none;padding:0;margin:0}
+ul.tick li{padding:8px 0 8px 26px;position:relative;font-size:14px;line-height:1.55;border-bottom:1px solid #f2f5fb}
+ul.tick li:before{content:"";position:absolute;left:4px;top:15px;width:8px;height:8px;border-radius:3px;background:var(--b,var(--cyan))}
+ul.tick li:last-child{border-bottom:0}
+
+.week{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+.week h4{font-size:14px;margin-bottom:8px}
+
+/* ---------- misc ---------- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140%);background:var(--ink);color:#fff;
+  padding:13px 20px;border-radius:14px;font-size:14px;z-index:90;transition:.3s;box-shadow:0 20px 40px -20px #000;max-width:90vw}
+.toast.on{transform:translateX(-50%)}
+.spin{width:17px;height:17px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.working{display:flex;align-items:center;gap:12px;padding:15px;border-radius:14px;background:linear-gradient(120deg,rgba(122,63,242,.1),rgba(18,168,207,.1));border:1px solid var(--line);font-size:14px;font-weight:500}
+.empty{text-align:center;padding:48px 20px;color:var(--mist)}
+.empty b{display:block;font-family:var(--display);font-size:20px;color:var(--ink);margin-bottom:8px}
+@media print{
+  .topbar,.nav,.noprint{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="gate">
+  <div class="gate">
+    <div>
+      <div class="eyebrow">SPM 1119/2 &nbsp;·&nbsp; English Language Writing</div>
+      <h1 style="margin:14px 0">Mark the script.<br><em>Then fix the gap.</em></h1>
+      <p class="lede">Photograph a candidate's Part 1, 2 and 3, and Band Rail applies the four examiner sub-scales — Content, Communicative Achievement, Organisation, Language — the way the writing examiner manual describes them. You get band scores, the evidence behind each one, and an intervention plan the student can actually start on Monday.</p>
+      <div class="marks">
+        <div>A2 · Part 1 email</div><div>B1 · Part 2 essay</div><div>B2 · Part 3 extended</div><div>60 marks total</div>
+      </div>
+    </div>
+    <div class="card pad" style="border-radius:22px">
+      <h2 style="font-size:22px">Sign in with DELIMa</h2>
+      <p class="hint" style="margin:8px 0 18px">Use your teacher Google account (@moe-dl.edu.my). Your name and email stay on this device and label every report you produce.</p>
+      <label class="f"><span>DELIMa / Google email</span><input type="email" id="gEmail" placeholder="cikgu@moe-dl.edu.my" autocomplete="email"></label>
+      <label class="f"><span>Your name</span><input type="text" id="gName" placeholder="e.g. Khairul Hafizi"></label>
+      <label class="f"><span>School</span><input type="text" id="gSchool" placeholder="e.g. SMK RPS Betau"></label>
+      <button class="btn tone" id="gGo" style="width:100%;justify-content:center">Sign in</button>
+      <p class="hint" id="gNote" style="margin-top:14px"></p>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<header class="topbar">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="11" fill="#101334"/><rect x="7" y="20" width="5" height="7" rx="1.6" fill="#1e9ee8"/><rect x="14.5" y="14" width="5" height="13" rx="1.6" fill="#5fbb3f"/><rect x="22" y="7" width="5" height="20" rx="1.6" fill="#e8382c"/></svg>
+    <div><b>Band Rail</b><small>SPM Writing 1119/2</small></div>
+  </div>
+  <nav class="nav">
+    <button data-go="home" aria-current="true">Home</button>
+    <button data-go="mark">Mark a script</button>
+    <button data-go="settings">Backup</button>
+  </nav>
+  <div class="who"><div class="avatar" id="tAv">?</div><span id="tName"></span></div>
+</header>
+
+<main>
+  <section class="view on" id="v-home"></section>
+  <section class="view" id="v-mark"></section>
+  <section class="view" id="v-report"></section>
+  <section class="view" id="v-practice"></section>
+  <section class="view" id="v-settings"></section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* =====================================================================
+   Band Rail — SPM Writing Paper 2 marking assistant
+   Criteria interpreted from the ES Instructions for Writing Examiners.
+   ===================================================================== */
+
+/* ---------- storage (artifact KV, with in-memory fallback) ---------- */
+const mem = {};
+const IN_ARTIFACT = (typeof window.storage !== 'undefined' && window.storage !== null);
+const LS_OK = (()=>{ try{ localStorage.setItem('__br','1'); localStorage.removeItem('__br'); return true; }catch(e){ return false; } })();
+const store = {
+  async get(k){
+    if(IN_ARTIFACT){ try{ const r = await window.storage.get(k); if(r) return JSON.parse(r.value); }catch(e){} }
+    if(LS_OK){ try{ const v = localStorage.getItem(k); if(v!==null) return JSON.parse(v); }catch(e){} }
+    return mem[k] ?? null;
+  },
+  async set(k,v){
+    mem[k]=v;
+    if(LS_OK){ try{ localStorage.setItem(k, JSON.stringify(v)); }
+      catch(e){ toast('This browser is out of storage space. Download a backup, then delete a few old records.',5000); } }
+    if(IN_ARTIFACT){ try{ await window.storage.set(k, JSON.stringify(v)); }catch(e){} }
+  }
+};
+const K_T='spm:teacher', K_R='spm:records', K_K='spm:key', K_E='spm:engine';
+let APIKEY=null;                       // legacy single key (Anthropic)
+let ENGINE='claude';                   // 'claude' | 'gemini' | 'manual'
+let KEYS={anthropic:'',gemini:''};
+let GMODEL='gemini-3.6-flash';
+const engineReady=()=> ENGINE==='manual' || (ENGINE==='claude' ? (IN_ARTIFACT||!!KEYS.anthropic) : !!KEYS.gemini);
+
+let TEACHER=null, RECORDS=[], CURRENT=null, VIEW='home';
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const avg=a=>a.length? a.reduce((x,y)=>x+y,0)/a.length : 0;
+const r1=n=>Math.round(n*10)/10;
+function toast(msg,ms=2600){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('on'),ms);}
+
+const CRIT=[
+  {k:'content',      name:'Content',                short:'Cont', c:'var(--plum)'},
+  {k:'communicative',name:'Communicative Achievement',short:'Comm', c:'var(--cyan)'},
+  {k:'organisation', name:'Organisation',           short:'Org',  c:'var(--mango)'},
+  {k:'language',     name:'Language',               short:'Lang', c:'var(--ok)'}
+];
+const PARTS=[
+  {n:1,key:'p1',label:'Part 1 · Email',    task:'short communicative message (email)', words:'about 80 words',   focus:'A2', colour:'var(--p1)', base:2},
+  {n:2,key:'p2',label:'Part 2 · Essay',    task:'guided writing (essay)',              words:'125–150 words',    focus:'B1', colour:'var(--p2)', base:4},
+  {n:3,key:'p3',label:'Part 3 · Extended', task:'extended writing (article, review, report or story)', words:'200–250 words', focus:'B2', colour:'var(--p3)', base:6}
+];
+
+/* ---------- CEFR continuum -------------------------------------------
+   The manual sets the three scales on one shared ladder: an average of 5
+   on Part 1 sits at the same rung as a 3 on Part 2 and a 1 on Part 3.
+   Rung = base + average criterion score.  Part1 base 2, Part2 4, Part3 6. */
+const RUNGS=['Below A1','Below A1','A1','A1','A1+','A2','A2+','B1','B1+','B2','B2+','C1'];
+const LEVEL_COLOUR={'Below A1':'#8b93b8','A1':'#8b93b8','A1+':'#6f7bd8','A2':'#12a8cf','A2+':'#12a8cf','B1':'#159f6b','B1+':'#159f6b','B2':'#f08a15','B2+':'#f08a15','C1':'#7a3ff2'};
+const RUNG_COLOUR=r=>LEVEL_COLOUR[RUNGS[Math.round(Math.max(0,Math.min(11,r)))]]||'#8b93b8';
+function rungOf(part, scores){
+  const p=PARTS.find(p=>p.key===part);
+  const a=avg(CRIT.map(c=>scores[c.k]??0));
+  return Math.max(0,Math.min(11, p.base + a));
+}
+function labelOf(rung){ return RUNGS[Math.round(rung)] || 'Below A1'; }
+function partTotal(s){ return CRIT.reduce((t,c)=>t+(s?.[c.k]??0),0); }
+function recTotal(r){ return PARTS.reduce((t,p)=>t+partTotal(r.parts?.[p.key]?.scores),0); }
+function recRung(r){
+  const done=PARTS.filter(p=>r.parts?.[p.key]?.scores);
+  if(!done.length) return 0;
+  return avg(done.map(p=>rungOf(p.key, r.parts[p.key].scores)));
+}
+
+/* ---------- the assessment scales, condensed for the marking engine ---- */
+const SCALE_TEXT = {
+p1:`PART 1 SCALE (midpoint A2). Score 0-5 on each criterion.
+5 | Content: everything relevant, target reader fully informed. Communicative: produces text conveying straightforward ideas, uses task conventions reasonably appropriately. Organisation: simple connectors plus a limited number of cohesive devices, used appropriately. Language: basic vocabulary used appropriately; simple grammatical forms with good control; errors are noticeable but meaning still gets through.
+3 | Content: minor irrelevance or omission; reader informed on the whole. Communicative: simple ideas expressed in simple ways. Organisation: connected with basic high-frequency connectors. Language: basic vocabulary used reasonably; simple forms with some control; errors sometimes block meaning.
+1 | Content: irrelevance or task misreading; reader only minimally informed. Communicative: isolated short units on simple concrete matters, not always getting the message across. Organisation: unlikely to be connected; occasional punctuation or "and". Language: isolated words and phrases; very few simple forms, limited control.
+0 | Content wholly irrelevant, reader not informed; performance below Score 1.
+4 and 2 are the in-between points.`,
+p2:`PART 2 SCALE (midpoint B1). Score 0-5 on each criterion.
+5 | Content: all relevant, reader fully informed. Communicative: uses task conventions to hold the reader's attention and put straightforward ideas across appropriately. Organisation: generally well organised and coherent with a variety of cohesive devices. Language: a range of everyday vocabulary, occasional misuse of less common words; simple plus some complex grammar with good control; errors do not block communication.
+3 | Content: minor irrelevance or omission; reader informed on the whole. Communicative: straightforward ideas, task conventions used reasonably appropriately. Organisation: simple connectors and a limited number of cohesive devices, appropriately used. Language: basic vocabulary used appropriately, simple forms with good control; errors noticeable but meaning determinable.
+1 | Content: irrelevance or misreading of the task; reader minimally informed. Communicative: simple ideas in simple ways. Organisation: connected with basic high-frequency connectors. Language: basic vocabulary used reasonably; simple forms with some control; errors sometimes block meaning.
+0 | Content wholly irrelevant, reader not informed; performance below Score 1.
+4 and 2 are the in-between points.`,
+p3:`PART 3 SCALE (midpoint B2). Score 0-5 on each criterion.
+5 | Content: all relevant, reader fully informed. Communicative: uses task conventions effectively to hold the reader's attention and communicate with ease, meeting every communicative purpose. Organisation: well organised and coherent, a variety of cohesive devices used to generally good effect. Language: a range of vocabulary including less common lexis, used appropriately; simple and complex grammar with control and flexibility; occasional errors and slips.
+3 | Content: minor irrelevance or omission; reader informed on the whole. Communicative: task conventions used to hold attention and convey straightforward ideas appropriately. Organisation: generally well organised and coherent, a variety of cohesive devices. Language: a range of everyday vocabulary with occasional misuse of less common words; simple plus some complex grammar, good control; errors do not block communication.
+1 | Content: irrelevance or misreading; reader minimally informed. Communicative: straightforward ideas, conventions used reasonably appropriately. Organisation: simple connectors and a limited number of cohesive devices. Language: basic vocabulary appropriately used, simple forms with good control; errors noticeable but meaning determinable.
+0 | Content wholly irrelevant, reader not informed; performance below Score 1.
+4 and 2 are the in-between points.`
+};
+
+const EXAMINER_RULES=`HOW EXAMINERS ARE TOLD TO APPLY THESE SCALES:
+- The only question that matters for each criterion is: which descriptor best describes this script?
+- Content is task achievement only: were the required points addressed and is the target reader informed. Do not judge language here. Low Content usually comes from misreading the task. Do not expect a one-to-one match between prompts and marks; judge the cumulative effect on the target reader.
+- Communicative Achievement is about genre, format, register, tone and whether every communicative purpose was met. An off-topic script written in the right genre and register can score low for Content and higher here.
+- Organisation covers coherence, paragraphing, punctuation, linking words and cohesive devices. Linking words are the simple ones (and, but, because, first of all). Cohesive devices are more sophisticated (moreover, as a result, reference pronouns, substitution, ellipsis). To earn a descriptor that names cohesive devices, the script must actually show them.
+- Language covers vocabulary and grammar: identify the type (basic / everyday / less common; simple / complex), then range, then how well controlled. Use accuracy as a tie-breaker only. Spelling sits here. Slips are one-off; errors are systematic - check elsewhere in the script before deciding which it is.
+- Length is not a criterion. Mark the script as presented. An over-length script may earn less for Content (irrelevance) or Communicative Achievement; an under-length script may simply fail to show enough range.
+- Give no credit for wording lifted from the question paper beyond key words and phrases.
+- Expect one variety of English used consistently. Malaysian-standard and British spelling are both fine; mixing British and American spelling of the same word is not.
+- A script may score high on one criterion and low on another. Mark each independently.
+- Award 4 or 2 when the script sits between two defined descriptors, or when parts of the higher and lower descriptor are both present.
+- Marking a script does not require harshness. Weak candidates should still get credit for what they can do.`;
+
+const CONTEXT_NOTE=`These are Malaysian secondary school candidates. Many sit between A1 and B2, and some write in a rural or Orang Asli school context where English is a third language. Judge the script strictly against the scale, but write all feedback so a teacher can act on it with limited class time and few resources.`;
+
+/* ---------- routing ---------- */
+function go(v){
+  VIEW=v;
+  $$('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
+  $$('.nav button').forEach(b=>b.setAttribute('aria-current', String(b.dataset.go===v)));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(v==='home') drawHome();
+  if(v==='settings') drawSettings();
+}
+$$('.nav button').forEach(b=>b.onclick=()=>{
+  if(b.dataset.go==='mark'){ newSession(); } else go(b.dataset.go);
+});
+
+/* ---------- sign in ---------- */
+async function boot(){
+  TEACHER = await store.get(K_T);
+  RECORDS = (await store.get(K_R)) || [];
+  APIKEY  = await store.get(K_K);
+  const cfg = await store.get(K_E);
+  if(cfg){ ENGINE=cfg.engine||'claude'; KEYS={anthropic:'',gemini:'',...(cfg.keys||{})}; GMODEL=cfg.model||GMODEL; }
+  if(APIKEY && !KEYS.anthropic) KEYS.anthropic=APIKEY;
+  if(!IN_ARTIFACT && !cfg && !APIKEY) ENGINE='manual';   // usable out of the box on your own site
+  if(TEACHER){ enter(); }
+  $('#gNote').innerHTML='This app runs inside Claude, which cannot open a Google sign-in window, so it does not read your Drive directly. Everything is saved on this device — use <b>Backup</b> to download a file you can drop into your DELIMa Drive, and restore it on any other device.';
+}
+$('#gGo').onclick=async()=>{
+  const email=$('#gEmail').value.trim(), name=$('#gName').value.trim(), school=$('#gSchool').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter a valid email address, e.g. cikgu@moe-dl.edu.my');
+  if(!name) return toast('Add your name so it appears on the reports');
+  TEACHER={email,name,school:school||'—',since:new Date().toISOString()};
+  await store.set(K_T,TEACHER);
+  enter(); toast('Signed in. Selamat datang, '+name.split(' ')[0]+'!');
+};
+$('#gEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('#gName').focus()});
+$('#gSchool').addEventListener('keydown',e=>{if(e.key==='Enter')$('#gGo').click()});
+
+function enter(){
+  $('#gate').style.display='none'; $('#app').style.display='block';
+  $('#tName').textContent=TEACHER.name;
+  $('#tAv').textContent=TEACHER.name.trim().slice(0,1).toUpperCase();
+  go('home');
+}
+async function saveRecords(){ await store.set(K_R,RECORDS); }
+
+/* =====================================================================
+   SIGNATURE COMPONENT — the band rail
+   The manual stacks all three tasks on one CEFR ladder; this draws that
+   ladder, shows each task's reachable window, and pins where the
+   candidate landed.
+   ===================================================================== */
+function bandRail(marks,{w=300,h=330,legend=true}={}){
+  const rows=12, top=26, rowH=(h-top-16)/rows;
+  const y=r=>top+(11-r)*rowH;
+  const cols=[{x:70,w:66,c:'var(--p1)',lo:3,hi:7,t:'P1'},{x:142,w:66,c:'var(--p2)',lo:5,hi:9,t:'P2'},{x:214,w:66,c:'var(--p3)',lo:7,hi:11,t:'P3'}];
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img" aria-label="CEFR band rail">`;
+  for(let r=0;r<=11;r++){
+    const lab=RUNGS[r], show=['A1','A2','B1','B2','C1'].includes(lab);
+    s+=`<line x1="60" y1="${y(r)+rowH/2}" x2="${w-6}" y2="${y(r)+rowH/2}" stroke="${show?'#dde2f0':'#f0f3fa'}" stroke-width="1"/>`;
+    if(show) s+=`<text x="8" y="${y(r)+rowH/2+4}" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="#6a7099">${lab}</text>`;
+  }
+  cols.forEach(c=>{
+    s+=`<rect x="${c.x}" y="${y(c.hi)}" width="${c.w}" height="${(c.hi-c.lo+1)*rowH}" rx="9" fill="${c.c}" opacity=".13"/>`;
+    s+=`<rect x="${c.x}" y="${y(c.hi)}" width="${c.w}" height="${(c.hi-c.lo+1)*rowH}" rx="9" fill="none" stroke="${c.c}" stroke-width="1.5" opacity=".55" stroke-dasharray="4 3"/>`;
+    s+=`<text x="${c.x+c.w/2}" y="16" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="600" fill="${c.c}">${c.t}</text>`;
+  });
+  (marks||[]).forEach((m,i)=>{
+    const c=cols[i]; if(!c||m==null) return;
+    const cy=y(Math.max(0,Math.min(11,m)))+rowH/2;
+    s+=`<g><rect x="${c.x}" y="${cy-rowH/2+2}" width="${c.w}" height="${rowH-4}" rx="7" fill="${c.c}"/>`
+      +`<text x="${c.x+c.w/2}" y="${cy+4.5}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" font-weight="700" fill="#fff">${labelOf(m)}</text></g>`;
+  });
+  s+='</svg>';
+  return `<div class="railwrap">${s}${legend?'<p class="hint" style="margin:10px 0 0">Each task is scored on its own scale, but all three sit on one ladder. A 5 on Part 1 and a 3 on Part 2 mean the same thing: B1.</p>':''}</div>`;
+}
+
+/* ---------- small charts ---------- */
+function barChart(items,{max=5,h=150}={}){
+  const n=items.length,w=300,pad=26,bw=(w-pad*2)/n*0.56,gap=(w-pad*2)/n;
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" role="img">`;
+  [0,.25,.5,.75,1].forEach(t=>{s+=`<line x1="${pad-8}" x2="${w-8}" y1="${18+(h-52)*(1-t)}" y2="${18+(h-52)*(1-t)}" stroke="#f0f3fa"/>`});
+  items.forEach((it,i)=>{
+    const v=Math.max(0,Math.min(max,it.v)), bh=(h-52)*(v/max), x=pad+gap*i+(gap-bw)/2, y=18+(h-52)-bh;
+    s+=`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(bh,2)}" rx="6" fill="${it.c}"><animate attributeName="height" from="0" to="${Math.max(bh,2)}" dur=".7s" fill="freeze"/><animate attributeName="y" from="${18+(h-52)}" to="${y}" dur=".7s" fill="freeze"/></rect>`;
+    s+=`<text x="${x+bw/2}" y="${y-6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700" fill="#101334">${r1(it.v)}</text>`;
+    s+=`<text x="${x+bw/2}" y="${h-14}" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="11" fill="#6a7099">${it.l}</text>`;
+  });
+  return s+'</svg>';
+}
+function distChart(records){
+  const buckets={};
+  RUNGS.forEach(l=>buckets[l]=0);
+  records.forEach(r=>{buckets[labelOf(recRung(r))]++});
+  const order=['Below A1','A1','A1+','A2','A2+','B1','B1+','B2','B2+','C1'];
+  const maxV=Math.max(1,...order.map(o=>buckets[o]||0));
+  return order.map((o,i)=>{
+    const v=buckets[o]||0, pct=v/maxV*100;
+    return `<div style="display:grid;grid-template-columns:52px 1fr 26px;gap:10px;align-items:center;margin-bottom:7px">
+      <span class="mono" style="font-size:11.5px;color:var(--mist)">${o}</span>
+      <div class="meter" style="height:14px"><i style="width:${pct}%;background:${LEVEL_COLOUR[o]};opacity:${v?1:.25}"></i></div>
+      <b class="mono" style="font-size:12.5px;${v?'':'opacity:.3'}">${v}</b></div>`;
+  }).join('');
+}
+
+function engineBanner(){
+  if(engineReady()) return '';
+  return `<div class="card pad" style="margin-bottom:16px;border-left:5px solid var(--p3);background:#fff7f6;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+    <div style="margin-right:auto"><b>The marking engine is not connected.</b>
+      <p class="hint" style="margin:4px 0 0">Add a key, or switch to marking by hand — that mode needs nothing and still builds the profile and the plan.</p></div>
+    <button class="btn sm" style="background:var(--p3)" onclick="go('settings')">Choose an engine</button></div>`;
+}
+
+/* =====================================================================
+   HOME
+   ===================================================================== */
+let CLASS_FILTER='all', SEARCH='';
+function drawHome(){
+  const el=$('#v-home');
+  const classes=[...new Set(RECORDS.map(r=>r.klass).filter(Boolean))].sort();
+  let rows=RECORDS.filter(r=>CLASS_FILTER==='all'||r.klass===CLASS_FILTER)
+                  .filter(r=>!SEARCH||r.name.toLowerCase().includes(SEARCH.toLowerCase()));
+  rows=[...rows].sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!RECORDS.length){
+    el.innerHTML=engineBanner()+`<div class="card pad" style="padding:0;overflow:hidden">
+      <div style="padding:30px 26px;background:linear-gradient(120deg,#101334,#2b3060);color:#fff">
+        <div class="eyebrow" style="color:#9fb4e8">Nothing marked yet</div>
+        <h2 style="font-size:30px;margin:10px 0">Hello, ${esc(TEACHER.name.split(' ')[0])}.</h2>
+        <p style="max-width:52ch;line-height:1.6;color:#c9d3f2;margin:0">Mark your first script and this page fills with the numbers you actually need at the end of a marking session: where the class sits on the CEFR ladder, which of the four sub-scales is dragging them down, and who needs pulling aside first.</p>
+        <button class="btn" style="background:var(--mango);color:#101334;margin-top:20px" onclick="newSession()">Mark a script</button>
+      </div>
+      <div class="pad">${bandRail([null,null,null],{legend:true})}</div></div>`;
+    return;
+  }
+
+  const totals=RECORDS.map(recTotal);
+  const critAvgs=CRIT.map(c=>{
+    const vals=[];
+    RECORDS.forEach(r=>PARTS.forEach(p=>{const s=r.parts?.[p.key]?.scores; if(s) vals.push(s[c.k]??0)}));
+    return {l:c.short,v:avg(vals),c:c.c,k:c.k,name:c.name};
+  });
+  const weakest=[...critAvgs].sort((a,b)=>a.v-b.v)[0];
+  const partAvgs=PARTS.map(p=>{
+    const vals=RECORDS.map(r=>r.parts?.[p.key]?.scores).filter(Boolean).map(partTotal);
+    return {l:'Part '+p.n,v:avg(vals),c:p.colour};
+  });
+  const classRung=avg(RECORDS.map(recRung));
+
+  el.innerHTML=`
+  ${engineBanner()}
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+    <div><div class="eyebrow">${esc(TEACHER.school)} · marking dashboard</div>
+      <h2 style="font-size:30px;margin-top:8px">Hello, ${esc(TEACHER.name.split(' ')[0])}.</h2></div>
+    <button class="btn tone" onclick="newSession()">+ Mark a script</button>
+  </div>
+
+  <div class="tiles" style="margin-bottom:16px">
+    <div class="tile"><span class="eyebrow">Scripts marked</span><b>${RECORDS.length}</b><i style="background:var(--plum)"></i></div>
+    <div class="tile"><span class="eyebrow">Average mark</span><b>${r1(avg(totals))}<small style="font-size:15px;color:var(--mist)">/60</small></b><i style="background:var(--cyan)"></i></div>
+    <div class="tile"><span class="eyebrow">Class sits at</span><b style="color:${RUNG_COLOUR(classRung)}">${labelOf(classRung)}</b><i style="background:var(--mango)"></i></div>
+    <div class="tile"><span class="eyebrow">Weakest sub-scale</span><b style="font-size:22px;margin-top:9px">${weakest.name.split(' ')[0]}</b><span class="hint">${r1(weakest.v)} of 5 on average</span><i style="background:var(--p3)"></i></div>
+  </div>
+
+  <div class="two" style="margin-bottom:16px">
+    <div class="card pad">
+      <span class="eyebrow">Where the class sits</span>
+      <h3 style="font-size:19px;margin:8px 0 16px">CEFR spread across ${RECORDS.length} script${RECORDS.length>1?'s':''}</h3>
+      ${distChart(RECORDS)}
+      <p class="hint" style="margin-top:12px">Placed by averaging each candidate's three tasks on the shared ladder — Part 1 tops out at B1, so a candidate can only reach B2+ by performing in Part 3.</p>
+    </div>
+    <div class="card pad">
+      <span class="eyebrow">The four sub-scales</span>
+      <h3 style="font-size:19px;margin:8px 0 6px">Average band, all parts</h3>
+      ${barChart(critAvgs)}
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px">
+        <span class="eyebrow">Marks per part</span>${barChart(partAvgs,{max:20,h:130})}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pad" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)">
+      <h3 style="font-size:18px;margin-right:auto">Candidates</h3>
+      <input type="text" id="q" placeholder="Search name" value="${esc(SEARCH)}" style="width:180px;padding:9px 12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="chip" aria-pressed="${CLASS_FILTER==='all'}" data-cf="all">All classes</button>
+        ${classes.map(c=>`<button class="chip" aria-pressed="${CLASS_FILTER===c}" data-cf="${esc(c)}">${esc(c)}</button>`).join('')}
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table><thead><tr><th>Candidate</th><th>Class</th><th>P1</th><th>P2</th><th>P3</th><th>Total</th><th>Level</th><th>Marked</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const rung=recRung(r);
+      return `<tr data-open="${r.id}">
+        <td><b>${esc(r.name)}</b></td><td class="mono" style="color:var(--mist)">${esc(r.klass||'—')}</td>
+        ${PARTS.map(p=>`<td class="mono">${r.parts?.[p.key]?.scores?partTotal(r.parts[p.key].scores):'<span style="opacity:.3">—</span>'}</td>`).join('')}
+        <td><b class="mono" style="font-size:15px">${recTotal(r)}</b><span style="color:var(--mist)">/60</span></td>
+        <td><span class="pill" style="background:${RUNG_COLOUR(rung)}1f;color:${RUNG_COLOUR(rung)}">${labelOf(rung)}</span></td>
+        <td class="hint">${new Date(r.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</td></tr>`;
+    }).join('')||`<tr><td colspan="8" class="empty">No candidate matches that filter.</td></tr>`}</tbody></table></div>
+  </div>`;
+
+  $('#q').oninput=e=>{SEARCH=e.target.value; drawHome(); const q=$('#q'); q.focus(); q.setSelectionRange(q.value.length,q.value.length);};
+  $$('[data-cf]',el).forEach(b=>b.onclick=()=>{CLASS_FILTER=b.dataset.cf;drawHome()});
+  $$('[data-open]',el).forEach(tr=>tr.onclick=()=>openReport(tr.dataset.open));
+}
+
+/* =====================================================================
+   MARKING SESSION
+   ===================================================================== */
+let SHOTS={p1:{q:[],a:[]},p2:{q:[],a:[]},p3:{q:[],a:[]}};
+let STEP=0; // 0 details, 1..3 parts, 4 done
+
+function newSession(){
+  CURRENT={id:uid(),name:'',klass:'',date:new Date().toISOString(),teacher:TEACHER.email,parts:{},genre:'article'};
+  SHOTS={p1:{q:[],a:[]},p2:{q:[],a:[]},p3:{q:[],a:[]}};
+  STEP=0; drawMark(); go('mark');
+}
+function stepBar(){
+  const names=['Candidate','Part 1 email','Part 2 essay','Part 3 extended','Report'];
+  return `<div class="steps">${names.map((n,i)=>
+    `<div class="step ${i===STEP?'now':''} ${i<STEP?'done':''}"><u>${i<STEP?'✓':i+1}</u>${n}</div>`).join('')}</div>`;
+}
+
+function drawMark(){
+  const el=$('#v-mark');
+  if(STEP===0){
+    el.innerHTML=stepBar()+`
+    <div class="card pad" style="max-width:620px">
+      <span class="eyebrow">Step 1</span>
+      <h2 style="font-size:26px;margin:8px 0 6px">Who wrote this script?</h2>
+      <p class="hint" style="margin-bottom:20px">The name and class label the report and feed the class analysis on your home page.</p>
+      <label class="f"><span>Candidate name</span><input type="text" id="sName" value="${esc(CURRENT.name)}" placeholder="e.g. Nurul Aisyah binti Ahmad"></label>
+      <label class="f"><span>Class</span><input type="text" id="sClass" value="${esc(CURRENT.klass)}" placeholder="e.g. 5 Amanah" list="klasses">
+        <datalist id="klasses">${[...new Set(RECORDS.map(r=>r.klass).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label>
+      <button class="btn tone" id="sGo">Start with Part 1 →</button>
+    </div>`;
+    $('#sGo').onclick=()=>{
+      CURRENT.name=$('#sName').value.trim(); CURRENT.klass=$('#sClass').value.trim();
+      if(!CURRENT.name) return toast('Add the candidate name first');
+      STEP=1; drawMark();
+    };
+    $('#sName').focus();
+    return;
+  }
+  if(STEP>=1&&STEP<=3) return drawPart(PARTS[STEP-1]);
+  if(STEP===4) return drawSessionEnd();
+}
+
+function drawPart(p){
+  const el=$('#v-mark');
+  const done=CURRENT.parts[p.key]?.scores?CURRENT.parts[p.key]:null;
+  el.innerHTML=stepBar()+`
+  <div class="card partcard" style="--c:${p.colour}">
+    <div class="pad">
+      <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+        <div style="margin-right:auto">
+          <span class="eyebrow" style="color:${p.colour}">${esc(CURRENT.name)} · ${esc(CURRENT.klass||'no class')}</span>
+          <h2 style="font-size:27px;margin:8px 0 6px">${p.label}</h2>
+          <p class="hint">${p.task} · ${p.words} · scale centred on ${p.focus}</p>
+        </div>
+        <div style="text-align:right"><span class="eyebrow">Marks available</span><div class="big" style="font-size:34px">20</div></div>
+      </div>
+
+      ${p.n===3?`<label class="f" style="max-width:280px;margin-top:18px"><span>Which task did the candidate choose?</span>
+        <select id="genre">${['article','review','report','story'].map(g=>`<option ${CURRENT.genre===g?'selected':''}>${g}</option>`).join('')}</select></label>`:''}
+
+      ${ENGINE==='manual'?'':`
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:18px" id="dropGrid">
+        ${shotBox(p,'q','Question paper','Photograph the task and its prompts so the marking follows the actual requirements.')}
+        ${shotBox(p,'a','The answer','Photograph every page of the candidate\u2019s writing. Straight on, good light.')}
+      </div>
+      <p class="hint" style="margin-top:10px">On a phone these open the camera. On a laptop they open your files. Photos are used for marking and are never saved into your records — only the marks, the notes and the transcript are kept.${(SHOTS[p.key].q.length+SHOTS[p.key].a.length)?` <b>About ${payloadMB(p.key).toFixed(1)} MB to send</b> — much over 4 MB on a mobile connection and the upload often gives up.`:''}</p>`}
+
+      <div id="markZone" style="margin-top:20px">
+        ${done?renderPartResult(p,done):''}
+      </div>
+
+      <div id="sampleZone" style="margin-top:20px">${sampleBlock(p)}</div>
+
+      ${handPanel(p)}
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+        ${ENGINE==='manual'?'':`<button class="btn" id="run" style="background:${p.colour}">${done?'Read the script again':'Read the script and mark it'}</button>`}
+        ${done?`<button class="btn ${ENGINE==='manual'?'':'ghost'}" id="next" ${ENGINE==='manual'?`style="background:${p.colour}"`:''}>${p.n<3?'Next: Part '+(p.n+1)+' →':'Build the report →'}</button>`:''}
+        <button class="btn ghost" id="skip" style="margin-left:auto">${p.n<3?'Skip this part':'Skip to report'}</button>
+      </div>
+    </div>
+  </div>`;
+
+  if(p.n===3) $('#genre').onchange=e=>CURRENT.genre=e.target.value;
+  if(ENGINE!=='manual') ['q','a'].forEach(kind=>wireShots(p,kind));
+  wireHand(p);
+  wireSample(p);
+  if($('#run')) $('#run').onclick=()=>markPart(p);
+  $('#skip').onclick=()=>{STEP=p.n<3?STEP+1:4; drawMark();};
+  if($('#next')) $('#next').onclick=()=>{STEP=p.n<3?STEP+1:4; drawMark();};
+}
+
+function shotBox(p,kind,title,help){
+  const list=SHOTS[p.key][kind];
+  return `<div>
+    <div class="drop ${list.length?'has':''}" id="drop-${kind}">
+      <div style="font-size:26px">${kind==='q'?'📄':'✍️'}</div>
+      <b style="display:block;margin:6px 0 4px;font-size:15px">${title}</b>
+      <p class="hint" style="max-width:34ch;margin:0 auto 12px">${help}</p>
+      <label class="btn ghost sm" style="cursor:pointer">${list.length?'Add more':'Take / choose photo'}
+        <input type="file" accept="image/*" capture="environment" multiple hidden id="in-${kind}"></label>
+      <div class="shots" id="sh-${kind}">${list.map((s,i)=>`<div class="shot"><img src="${s}" alt=""><button data-rm="${kind}:${i}">×</button></div>`).join('')}</div>
+    </div></div>`;
+}
+function wireShots(p,kind){
+  const inp=$('#in-'+kind), drop=$('#drop-'+kind);
+  inp.onchange=async e=>{
+    const files=[...e.target.files];
+    for(const f of files){
+      try{ SHOTS[p.key][kind].push(await shrink(f)); }catch(err){ toast('That file could not be read'); }
+    }
+    e.target.value=''; drawPart(p);
+  };
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('has')};
+  drop.ondrop=async e=>{e.preventDefault();
+    for(const f of [...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'))) SHOTS[p.key][kind].push(await shrink(f));
+    drawPart(p);};
+  $$('[data-rm]').forEach(b=>b.onclick=ev=>{ev.preventDefault();ev.stopPropagation();
+    const [k,i]=b.dataset.rm.split(':'); SHOTS[p.key][k].splice(+i,1); drawPart(p);});
+}
+function reshrink(dataURL,max=850,q=0.45){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const sc=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+      const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+      x.drawImage(img,0,0,c.width,c.height);
+      res(c.toDataURL('image/jpeg',q));
+    };
+    img.onerror=()=>res(dataURL); img.src=dataURL;
+  });
+}
+function payloadMB(key){
+  return ([...SHOTS[key].q,...SHOTS[key].a].reduce((t,d)=>t+d.length,0)*0.75/1048576);
+}
+function timeout(ms){ const c=new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; }
+function shrink(file,max=1200,q=0.62){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=()=>{const img=new Image();
+      img.onload=()=>{
+        const sc=Math.min(1,max/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+        const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height);
+        x.drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',q));
+      };
+      img.onerror=rej; img.src=fr.result;};
+    fr.onerror=rej; fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- what went wrong, and what to do about it ---------- */
+function failureCard(e){
+  const box=(title,body)=>`<div class="card pad" style="border-color:#f0cdca;background:#fff7f6">
+    <b style="font-size:16px">${title}</b><p class="hint" style="margin:8px 0 0;line-height:1.6">${body}</p>
+    <button class="btn ghost sm" style="margin-top:12px" onclick="go('settings')">Open marking engine settings</button></div>`;
+  if(e.message==='MANUAL') return box('Band Rail is set to mark by hand.',
+    'Use the band grid below to award the four sub-scales yourself, or connect a marking engine under <b>Backup \u2192 Marking engine</b> to have the script read for you.');
+  if(e.message==='NO_KEY') return box('This copy needs an API key first.',
+    'You are running Band Rail from your own web address, so it cannot borrow Claude\u2019s marking. Under <b>Backup \u2192 Marking engine</b> you can add a Google Gemini key (free tier), an Anthropic key, or switch to marking by hand. Keys stay in this browser only.');
+  if(e.message==='BAD_KEY') return box('The API key was rejected.',
+    'Check that the key was copied in full from console.anthropic.com, that it has not been revoked, and that the account still has credit.');
+  if(e.message==='NO_REACH'||e.message==='TIMED_OUT') return `<div class="card pad" style="border-color:#f0cdca;background:#fff7f6">
+    <b style="font-size:16px">The photos did not make it to the marking service.</b>
+    <p class="hint" style="margin:8px 0 0;line-height:1.6">Already retried once with smaller images. This is almost always the upload rather than a block: heavy photos on a weak connection. Try removing any photo you do not strictly need, move to a stronger signal, then mark again — or award the bands by hand below. Nothing already marked is lost.</p></div>`;
+  return `<div class="card pad" style="border-color:#f0cdca;background:#fff7f6">
+    <b style="font-size:16px">The marking did not come back.</b>
+    <p class="hint" style="margin:8px 0 0;line-height:1.6">${esc(e.message)}. Very long scripts sometimes time out \u2014 try again, or take fewer, sharper photos of the answer.</p></div>`;
+}
+
+/* ---------- the marking call ---------- */
+async function callClaude(content,maxTokens=2000){ return callAI(content,maxTokens); }
+
+async function callAI(content,maxTokens=2000){
+  if(ENGINE==='manual') throw new Error('MANUAL');
+  if(ENGINE==='gemini') return callGemini(content,maxTokens);
+  return callAnthropic(content,maxTokens);
+}
+
+function parseJSON(text){
+  const clean=text.replace(/```json|```/g,'').trim();
+  const a=clean.indexOf('{'), b=clean.lastIndexOf('}');
+  if(a<0||b<0) throw new Error('The model replied without any JSON. Try marking again.');
+  return JSON.parse(clean.slice(a,b+1));
+}
+
+async function callAnthropic(content,maxTokens){
+  const key=KEYS.anthropic||APIKEY;
+  if(!IN_ARTIFACT && !key) throw new Error('NO_KEY');
+  const headers={'Content-Type':'application/json'};
+  if(key){ headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true'; }
+  let res;
+  try{
+    res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,signal:timeout(120000),
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTokens,messages:[{role:'user',content}]})});
+  }catch(e){ throw new Error(e.name==='AbortError'?'TIMED_OUT':'NO_REACH'); }
+  await guard(res);
+  const data=await res.json();
+  return parseJSON(data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n'));
+}
+
+async function callGemini(content,maxTokens){
+  if(!KEYS.gemini) throw new Error('NO_KEY');
+  const parts=content.map(b=> b.type==='text' ? {text:b.text}
+    : {inline_data:{mime_type:b.source.media_type,data:b.source.data}});
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GMODEL)}:generateContent?key=${encodeURIComponent(KEYS.gemini)}`;
+  let res;
+  try{
+    res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      signal:timeout(120000),
+      body:JSON.stringify({contents:[{role:'user',parts}],
+        generationConfig:{temperature:0.2,maxOutputTokens:Math.max(maxTokens,2048),responseMimeType:'application/json'}})});
+  }catch(e){ throw new Error(e.name==='AbortError'?'TIMED_OUT':'NO_REACH'); }
+  if(res.status===404) throw new Error('The model name "'+GMODEL+'" was not accepted. Open Backup and press "Find my models" to pick one your key can use.');
+  await guard(res);
+  const data=await res.json();
+  const txt=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n');
+  if(!txt) throw new Error(data.promptFeedback?.blockReason ? 'Google blocked this request ('+data.promptFeedback.blockReason+'). Retake the photo and try again.' : 'The model returned an empty reply. Try marking again.');
+  return parseJSON(txt);
+}
+
+async function guard(res){
+  if(res.status===401||res.status===403) throw new Error('BAD_KEY');
+  if(res.status===429) throw new Error('Your key hit its rate or quota limit. Wait a minute, or check your usage in the provider console.');
+  if(res.status===503||res.status===529) throw new Error('The service is busy right now. Try marking again in a moment.');
+  if(!res.ok){ let d=''; try{ const j=await res.json(); d=j.error?.message||''; }catch(e){} throw new Error('HTTP '+res.status+(d?' — '+d:'')); }
+}
+
+async function listGeminiModels(){
+  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='+encodeURIComponent(KEYS.gemini));
+  await guard(r);
+  const j=await r.json();
+  return (j.models||[])
+    .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+    .map(m=>m.name.replace('models/',''))
+    .filter(n=>!/embedding|aqa|imagen|veo|tts|image$/i.test(n));
+}
+
+function imgBlocks(arr,caption){
+  const out=[];
+  if(arr.length){ out.push({type:'text',text:caption}); }
+  arr.forEach(d=>out.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:d.split(',')[1]}}));
+  return out;
+}
+
+async function markPart(p){
+  if(!SHOTS[p.key].a.length) return toast('Photograph the candidate\u2019s answer first');
+  const zone=$('#markZone');
+  zone.innerHTML=`<div class="working"><div class="spin" style="border-color:rgba(16,19,52,.2);border-top-color:${p.colour}"></div>
+    <div><b>Reading the script…</b><div class="hint">Transcribing the handwriting, then applying the Part ${p.n} scale to all four sub-scales.</div></div></div>`;
+  $('#run').disabled=true;
+
+  const prompt=`You are an experienced SPM English Language Writing Examiner marking Paper 1119/2, Part ${p.n} (${p.task}, ${p.words}, scale centred on ${p.focus}).
+
+${SCALE_TEXT[p.key]}
+
+${EXAMINER_RULES}
+
+${CONTEXT_NOTE}
+${p.n===3?`The candidate chose the ${CURRENT.genre.toUpperCase()} option, so judge Communicative Achievement against the conventions of a ${CURRENT.genre}.`:''}
+
+Read the photographs. Transcribe the candidate's answer exactly as written, keeping their spelling and grammar mistakes. Then award 0-5 for each of the four sub-scales and justify each one against the descriptor you chose.
+
+Reply with JSON only, no other text:
+{
+ "transcript":"the candidate's answer, verbatim, line breaks as \\n",
+ "wordCount": <number>,
+ "taskRead":"one sentence on what the question actually required",
+ "scores":{"content":0-5,"communicative":0-5,"organisation":0-5,"language":0-5},
+ "why":{"content":"2-3 sentences naming the descriptor met and the evidence","communicative":"...","organisation":"...","language":"..."},
+ "evidence":[{"criterion":"content|communicative|organisation|language","quote":"short phrase copied from the script","note":"what it shows"}],
+ "errors":[{"type":"grammar|vocabulary|spelling|punctuation","wrote":"what the candidate wrote","fix":"the correction","systematic":true|false}],
+ "didWell":["2-4 short specific points"],
+ "toImprove":["2-4 short specific points, written as an instruction to the student"]
+}`;
+
+  const build=()=>[{type:'text',text:prompt},...imgBlocks(SHOTS[p.key].q,'QUESTION PAPER:'),...imgBlocks(SHOTS[p.key].a,'CANDIDATE ANSWER:')];
+  try{
+    let out;
+    try{
+      out=await callClaude(build(),3000);
+    }catch(err){
+      if(err.message!=='NO_REACH'&&err.message!=='TIMED_OUT') throw err;
+      zone.innerHTML=`<div class="working"><div class="spin" style="border-color:rgba(16,19,52,.2);border-top-color:${p.colour}"></div>
+        <div><b>The upload gave up. Shrinking the photos and trying once more…</b><div class="hint">${payloadMB(p.key).toFixed(1)} MB was too much for this connection.</div></div></div>`;
+      SHOTS[p.key].q=await Promise.all(SHOTS[p.key].q.map(d=>reshrink(d)));
+      SHOTS[p.key].a=await Promise.all(SHOTS[p.key].a.map(d=>reshrink(d)));
+      out=await callClaude(build(),3000);
+    }
+    CRIT.forEach(c=>{out.scores[c.k]=Math.max(0,Math.min(5,Math.round(out.scores[c.k]??0)))});
+    CURRENT.parts[p.key]={...(CURRENT.parts[p.key]||{}),...out};
+    if(p.n===3) CURRENT.parts.p3.genre=CURRENT.genre;
+    drawPart(p);
+    toast(`Part ${p.n} marked — ${partTotal(out.scores)}/20`);
+  }catch(e){
+    zone.innerHTML=failureCard(e);
+    $('#run').disabled=false;
+  }
+}
+
+/* ---------- one part's result ---------- */
+function renderPartResult(p,out){
+  const rung=rungOf(p.key,out.scores);
+  return `<div class="grid" style="grid-template-columns:1.25fr .75fr;gap:18px" class="resgrid">
+    <div>
+      <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:14px">
+        <div class="big" style="color:${p.colour}">${partTotal(out.scores)}<small>/20</small></div>
+        <div><span class="pill" style="background:${RUNG_COLOUR(rung)}1f;color:${RUNG_COLOUR(rung)}">${labelOf(rung)} on this task</span>
+        <div class="hint" style="margin-top:4px">${out.wordCount||'?'} words written</div></div>
+      </div>
+      ${CRIT.map(c=>{const v=out.scores[c.k];return `<div class="scorerow">
+        <span style="font-size:12.5px;font-weight:600">${c.name.split(' ')[0]}${c.k==='communicative'?' Ach.':''}</span>
+        <div class="meter"><i style="width:${v/5*100}%;background:${c.c}"></i></div><b>${v}</b></div>`}).join('')}
+      <p class="hint" style="margin-top:10px">${out.byHand?`<b>Marked by hand.</b>${out.teacherNote?' '+esc(out.teacherNote):''}`:`<b>Task read as:</b> ${esc(out.taskRead||'—')}`}</p>
+    </div>
+    <div>
+      ${(out.didWell||[]).length?`<span class="eyebrow">Did well</span><ul class="tick" style="margin-bottom:12px">${out.didWell.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+      ${(out.toImprove||[]).length?`<span class="eyebrow">Must fix</span><ul class="tick">${out.toImprove.map(t=>`<li style="--b:var(--p3)">${esc(t)}</li>`).join('')}</ul>`:''}
+    </div>
+  </div>
+  <div style="margin-top:18px">
+    ${out.byHand&&!out.why?CRIT.map(c=>`<details class="accordion"><summary><span style="width:9px;height:9px;border-radius:3px;background:${c.c};display:inline-block"></span>${c.name} — band ${out.scores[c.k]}</summary>
+      <div class="body">${esc(descFor(p.key,c.k,out.scores[c.k]))}</div></details>`).join(''):
+    CRIT.map(c=>`<details class="accordion"><summary><span style="width:9px;height:9px;border-radius:3px;background:${c.c};display:inline-block"></span>${c.name} — band ${out.scores[c.k]} · why</summary>
+      <div class="body">${esc(out.why?.[c.k]||'—')}
+      ${(out.evidence||[]).filter(e=>e.criterion===c.k).map(e=>`<div class="quote">“${esc(e.quote)}” — ${esc(e.note)}</div>`).join('')}</div></details>`).join('')}
+    ${(out.errors||[]).length?`<details class="accordion"><summary>Error list — ${out.errors.length} found</summary><div class="body">
+      <table style="font-size:13px"><thead><tr><th>Wrote</th><th>Should be</th><th>Type</th></tr></thead><tbody>
+      ${out.errors.map(e=>`<tr style="cursor:default"><td>${esc(e.wrote)}</td><td style="color:var(--ok);font-weight:600">${esc(e.fix)}</td><td class="hint">${esc(e.type)}${e.systematic?' · repeated':''}</td></tr>`).join('')}
+      </tbody></table></div></details>`:''}
+    ${out.transcript?`<details class="accordion"><summary>Transcript of the script</summary><div class="body" style="white-space:pre-wrap;font-size:13.5px">${esc(out.transcript)}</div></details>`:''}
+  </div>`;
+}
+
+/* ---------- end of session: build report ---------- */
+async function drawSessionEnd(){
+  const el=$('#v-mark');
+  const marked=PARTS.filter(p=>CURRENT.parts[p.key]?.scores);
+  if(!marked.length){ toast('Nothing was marked — nothing to report'); STEP=1; return drawMark(); }
+  el.innerHTML=stepBar()+`<div class="card pad"><div class="working"><div class="spin" style="border-color:rgba(16,19,52,.2);border-top-color:var(--plum)"></div>
+    <div><b>Writing the intervention plan…</b><div class="hint">Comparing the three tasks, finding the pattern, and turning it into work you can set.</div></div></div></div>`;
+
+  const summary=marked.map(p=>{
+    const o=CURRENT.parts[p.key];
+    return `${p.label} (${partTotal(o.scores)}/20, ${labelOf(rungOf(p.key,o.scores))}): Content ${o.scores.content}, Communicative ${o.scores.communicative}, Organisation ${o.scores.organisation}, Language ${o.scores.language}.
+Examiner notes: ${o.why?.content||''} ${o.why?.communicative||''} ${o.why?.organisation||''} ${o.why?.language||''}
+Repeated errors: ${(o.errors||[]).filter(e=>e.systematic).map(e=>e.wrote+' -> '+e.fix).join('; ')||'none flagged'}`;
+  }).join('\n\n');
+
+  const prompt=`A Malaysian SPM English Writing candidate has just been marked on Paper 1119/2. Here is the examiner record:
+
+Candidate: ${CURRENT.name}, class ${CURRENT.klass||'unspecified'}
+Total: ${recTotal(CURRENT)}/60. Overall CEFR placement: ${labelOf(recRung(CURRENT))}.
+
+${summary}
+
+${CONTEXT_NOTE}
+
+Write the intervention the class teacher should run. Be concrete: name the sub-scale, the actual weakness in this candidate's writing, and a task the student can do. Do not praise vaguely and do not repeat the scores back.
+
+JSON only:
+{
+ "diagnosis":"3-4 sentences. What is actually holding this candidate back across the three tasks, and what is already working. Written to the teacher.",
+ "priorities":[{"criterion":"Content|Communicative Achievement|Organisation|Language","gap":"the specific weakness in this script","target":"what a one-band improvement would look like","why":"one line on why this is the highest-value fix first"}],
+ "plan":[{"week":"Week 1","focus":"short title","activities":["2-3 classroom or homework tasks, each doable in under 30 minutes"],"check":"how the teacher knows it worked"}],
+ "drill":{"title":"one short writing task to set now","instructions":"the task exactly as you would give it to the student, 2-4 sentences","successCriteria":["3 checkable points the student marks their own work against"]},
+ "toStudent":"4-5 sentences addressed to the student in simple, warm English at their level. Say what they did well, then the one thing to change next.",
+ "wordBank":["6-10 words or phrases this candidate should start using in the next essay, chosen from the gap in their writing"]
+}
+Give exactly 3 priorities, highest value first, and exactly 3 weeks in the plan.`;
+
+  if(ENGINE==='manual'){
+    CURRENT.report=localReport(CURRENT);
+    CURRENT.total=recTotal(CURRENT); CURRENT.rung=recRung(CURRENT);
+    RECORDS=RECORDS.filter(r=>r.id!==CURRENT.id); RECORDS.push(CURRENT);
+    await saveRecords(); SHOTS={p1:{q:[],a:[]},p2:{q:[],a:[]},p3:{q:[],a:[]}};
+    openReport(CURRENT.id); return toast('Report built and saved');
+  }
+  try{
+    CURRENT.report=await callClaude([{type:'text',text:prompt}],3000);
+  }catch(e){
+    const why = e.message==='NO_KEY' ? 'no key is saved yet' :
+                e.message==='BAD_KEY' ? 'the key was rejected' :
+                e.message==='NO_REACH' ? 'the service could not be reached' : e.message;
+    CURRENT.report=localReport(CURRENT);
+    CURRENT.report.diagnosis='[Built without the marking service \u2014 '+why+'. Everything below comes from the bands themselves.] '+CURRENT.report.diagnosis;
+  }
+  CURRENT.total=recTotal(CURRENT); CURRENT.rung=recRung(CURRENT);
+  RECORDS=RECORDS.filter(r=>r.id!==CURRENT.id); RECORDS.push(CURRENT);
+  await saveRecords();
+  SHOTS={p1:{q:[],a:[]},p2:{q:[],a:[]},p3:{q:[],a:[]}};
+  openReport(CURRENT.id);
+  toast('Saved to your records');
+}
+
+/* =====================================================================
+   REPORT
+   ===================================================================== */
+function openReport(id){
+  const r=RECORDS.find(x=>x.id===id); if(!r) return;
+  CURRENT=r;
+  const el=$('#v-report');
+  const marks=PARTS.map(p=>r.parts?.[p.key]?.scores?rungOf(p.key,r.parts[p.key].scores):null);
+  const rung=recRung(r), rep=r.report||{};
+  const critVals=CRIT.map(c=>({l:c.short,c:c.c,v:avg(PARTS.filter(p=>r.parts?.[p.key]).map(p=>r.parts[p.key].scores[c.k]))}));
+
+  el.innerHTML=`
+  <div class="noprint" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn ghost sm" onclick="go('home')">← All candidates</button>
+    <button class="btn ghost sm" onclick="window.print()">Print / save as PDF</button>
+    <button class="btn ghost sm" onclick="copyStudentNote()">Copy the note to the student</button>
+    <button class="btn sm" style="background:var(--plum)" onclick="openPractice('${r.id}')">Open the repair room →</button>
+    <button class="btn danger sm" style="margin-left:auto" onclick="delRecord('${r.id}')">Delete this record</button>
+  </div>
+
+  <div class="card" style="overflow:hidden;margin-bottom:16px">
+    <div style="padding:26px;background:linear-gradient(120deg,#101334,#2b3060);color:#fff;display:flex;gap:22px;flex-wrap:wrap;align-items:center">
+      <div style="margin-right:auto">
+        <div class="eyebrow" style="color:#9fb4e8">SPM 1119/2 Writing · marked ${new Date(r.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+        <h2 style="font-size:32px;margin:8px 0 4px">${esc(r.name)}</h2>
+        <p style="margin:0;color:#c9d3f2">${esc(r.klass||'No class')} · marked by ${esc(TEACHER.name)}, ${esc(TEACHER.school)}</p>
+      </div>
+      <div style="text-align:right">
+        <div class="big" style="color:#fff">${recTotal(r)}<small style="color:#9fb4e8">/60</small></div>
+        <span class="pill" style="background:${RUNG_COLOUR(rung)};color:#fff;margin-top:6px">Overall ${labelOf(rung)}</span>
+      </div>
+    </div>
+    <div class="pad two" style="align-items:start">
+      <div>
+        <span class="eyebrow">Band profile across the paper</span>
+        <h3 style="font-size:19px;margin:8px 0 12px">Where each task landed</h3>
+        ${PARTS.map(p=>{const s=r.parts?.[p.key]?.scores; if(!s) return `<div class="hint" style="padding:10px 0">${p.label} — not marked</div>`;
+          return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:5px">
+            <span style="color:${p.colour}">${p.label}${p.key==='p3'&&r.parts.p3.genre?' · '+esc(r.parts.p3.genre):''}</span>
+            <span class="mono">${partTotal(s)}/20 · ${labelOf(rungOf(p.key,s))}</span></div>
+            <div style="display:flex;gap:4px">${CRIT.map(c=>`<div style="flex:1"><div class="meter" style="height:9px"><i style="width:${s[c.k]/5*100}%;background:${c.c}"></i></div>
+            <div class="hint" style="font-size:10px;margin-top:3px;text-align:center">${c.short} ${s[c.k]}</div></div>`).join('')}</div></div>`;
+        }).join('')}
+        <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">
+          <span class="eyebrow">Average band per sub-scale</span>${barChart(critVals,{h:140})}</div>
+      </div>
+      <div>${bandRail(marks,{legend:true})}</div>
+    </div>
+  </div>
+
+  ${rep.diagnosis?`<div class="card pad" style="margin-bottom:16px;border-left:5px solid var(--plum)">
+    <span class="eyebrow">Diagnosis</span><h3 style="font-size:20px;margin:8px 0 10px">What is holding this candidate back</h3>
+    <p style="line-height:1.65;margin:0;color:var(--ink-2)">${esc(rep.diagnosis)}</p></div>`:''}
+
+  ${(rep.priorities||[]).length?`<div style="margin-bottom:16px"><span class="eyebrow">Fix in this order</span>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:10px">
+    ${rep.priorities.map((p,i)=>{const c=CRIT.find(c=>p.criterion?.toLowerCase().startsWith(c.k.slice(0,4)))||CRIT[i%4];
+      return `<div class="card pad" style="border-top:4px solid ${c.c}">
+        <div class="mono" style="font-size:11px;color:var(--mist)">PRIORITY ${i+1}</div>
+        <h4 style="font-size:17px;margin:6px 0 10px">${esc(p.criterion)}</h4>
+        <p style="font-size:14px;line-height:1.55;margin:0 0 10px">${esc(p.gap)}</p>
+        <div class="quote" style="border-color:${c.c}"><b>Target:</b> ${esc(p.target)}</div>
+        <p class="hint" style="margin:8px 0 0">${esc(p.why||'')}</p></div>`}).join('')}</div></div>`:''}
+
+  ${(rep.plan||[]).length?`<div class="card pad" style="margin-bottom:16px">
+    <span class="eyebrow">Three-week intervention</span><h3 style="font-size:20px;margin:8px 0 14px">What to run in class</h3>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+    ${rep.plan.map((w,i)=>`<div class="week"><div class="mono" style="font-size:11px;color:${[ 'var(--p1)','var(--p2)','var(--p3)'][i%3]}">${esc(w.week)}</div>
+      <h4>${esc(w.focus)}</h4><ul class="tick">${(w.activities||[]).map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+      <p class="hint" style="margin:10px 0 0"><b>Check:</b> ${esc(w.check||'')}</p></div>`).join('')}</div></div>`:''}
+
+  ${rep.drill?`<div class="card pad" style="margin-bottom:16px;background:linear-gradient(120deg,rgba(255,176,32,.12),rgba(18,168,207,.08))">
+    <span class="eyebrow">Set this now</span><h3 style="font-size:20px;margin:8px 0 8px">${esc(rep.drill.title)}</h3>
+    <p style="line-height:1.6;margin:0 0 12px">${esc(rep.drill.instructions)}</p>
+    <b style="font-size:13px">The student ticks these before handing it in:</b>
+    <ul class="tick">${(rep.drill.successCriteria||[]).map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:''}
+
+  <div class="two" style="margin-bottom:16px">
+    ${rep.toStudent?`<div class="card pad"><span class="eyebrow">Hand this to the student</span>
+      <p id="studentNote" style="font-size:16px;line-height:1.7;margin:10px 0 0">${esc(rep.toStudent)}</p></div>`:'<div></div>'}
+    ${(rep.wordBank||[]).length?`<div class="card pad"><span class="eyebrow">Word bank for the next essay</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">${rep.wordBank.map(w=>`<span class="pill" style="background:var(--paper);font-size:13px;padding:7px 12px">${esc(w)}</span>`).join('')}</div></div>`:''}
+  </div>
+
+  ${PARTS.some(p=>r.parts?.[p.key]?.sample)?`<div class="card pad" style="margin-bottom:16px">
+    <span class="eyebrow">Model answers</span><h3 style="font-size:20px;margin:8px 0 4px">What a band 5 looks like on this paper</h3>
+    <p class="hint" style="margin-bottom:6px">Hand these out beside the marked script — the gap between the two is the lesson.</p>
+    ${PARTS.filter(p=>r.parts?.[p.key]?.sample).map(p=>{
+      const sm=r.parts[p.key].sample, list=p.n===3?(sm.samples||[]):[sm];
+      return `<details class="accordion" style="margin-top:10px"><summary style="border-left:4px solid ${p.colour}">${p.label} — ${list.length} model answer${list.length>1?'s':''}</summary>
+        <div class="body">${list.map((x,i)=>modelCard(p,x,i)).join('')}</div></details>`;
+    }).join('')}
+  </div>`:''}
+
+  <div class="card pad">
+    <span class="eyebrow">Examiner record</span><h3 style="font-size:20px;margin:8px 0 14px">Evidence behind every band</h3>
+    ${PARTS.filter(p=>r.parts?.[p.key]?.scores).map(p=>`<details class="accordion" ${p.key==='p1'?'open':''}>
+      <summary style="border-left:4px solid ${p.colour}">${p.label} — ${partTotal(r.parts[p.key].scores)}/20</summary>
+      <div class="body">${renderPartResult(p,r.parts[p.key])}</div></details>`).join('')}
+  </div>`;
+  go('report');
+}
+function copyStudentNote(){
+  const t=$('#studentNote')?.textContent||''; if(!t) return toast('No student note in this report');
+  navigator.clipboard.writeText(t).then(()=>toast('Copied — paste it into Google Classroom or WhatsApp'),()=>toast('Copy failed; select the text instead'));
+}
+async function delRecord(id){
+  if(!confirm('Delete this candidate\u2019s record? This cannot be undone.')) return;
+  RECORDS=RECORDS.filter(r=>r.id!==id); await saveRecords(); toast('Record deleted'); go('home');
+}
+
+/* =====================================================================
+   BACKUP / RESTORE  (the Google Drive route)
+   ===================================================================== */
+function drawSettings(){
+  const el=$('#v-settings');
+  const size=(JSON.stringify(RECORDS).length/1024).toFixed(0);
+  el.innerHTML=`
+  <h2 style="font-size:28px;margin-bottom:6px">Backup and account</h2>
+  <p class="hint" style="margin-bottom:20px;max-width:60ch">Your marking is saved in this browser on this device. Download it as a file and keep that file in your DELIMa Google Drive — that is your backup, and it is how you move a class between your phone and your laptop.</p>
+  <div class="two">
+    <div class="card pad">
+      <span class="eyebrow">Your records</span>
+      <h3 style="font-size:19px;margin:8px 0 12px">${RECORDS.length} candidate${RECORDS.length===1?'':'s'} · ${size} KB</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="dl">Download backup (.json)</button>
+        <button class="btn ghost" id="csv">Export marks (.csv)</button>
+        <label class="btn ghost" style="cursor:pointer">Restore from file<input type="file" accept=".json" hidden id="up"></label>
+      </div>
+      <p class="hint" style="margin-top:14px">Restoring merges the file into what you already have; candidates with the same record are replaced, not duplicated.</p>
+    </div>
+    <div class="card pad">
+      <span class="eyebrow">Signed in as</span>
+      <h3 style="font-size:19px;margin:8px 0 4px">${esc(TEACHER.name)}</h3>
+      <p class="hint" style="margin:0 0 14px">${esc(TEACHER.email)} · ${esc(TEACHER.school)}</p>
+      <button class="btn ghost sm" id="out">Sign out</button>
+      <p class="hint" style="margin-top:16px">Signing out clears your name from this device. Your marked scripts stay unless you delete them.</p>
+    </div>
+  </div>
+  <div class="card pad" style="margin-top:16px;border-left:5px solid ${engineReady()?'var(--ok)':'var(--p3)'}">
+    <span class="eyebrow">Marking engine</span>
+    <h3 style="font-size:19px;margin:8px 0 10px">${ENGINE==='manual'?'Marking by hand — no service needed':(engineReady()?'Connected':'Not connected yet')}</h3>
+    <p class="hint" style="max-width:66ch">Choose how a script gets read. Marking by hand needs nothing at all: you award the four bands yourself against the descriptors, and Band Rail still builds the profile, the class analysis and the intervention plan.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">
+      ${[['manual','Mark by hand','free, offline'],['gemini','Google Gemini','free tier, your DELIMa Google account'],['claude','Claude','Anthropic key']]
+        .map(([v,t,n])=>`<button class="chip" data-eng="${v}" aria-pressed="${ENGINE===v}" style="padding:11px 15px;text-align:left">
+          <b style="display:block;font-size:14px">${t}</b><span style="font-size:11.5px;opacity:.7">${n}</span></button>`).join('')}
+    </div>
+
+    ${ENGINE==='manual'?`<p class="hint" style="max-width:66ch;margin:0">Nothing else to set up. Open a part, tap the band you are awarding on each of the four sub-scales, and add your own note. The report is built from a bank of interventions keyed to the sub-scale you marked lowest.</p>`:''}
+
+    ${ENGINE==='gemini'?`
+      <label class="f" style="max-width:480px"><span>Google AI Studio API key</span>
+        <input type="password" id="gkey" placeholder="AIza..." value="${esc(KEYS.gemini||'')}" autocomplete="off"></label>
+      <label class="f" style="max-width:480px"><span>Model</span>
+        <input type="text" id="gmodel" list="gmodels" value="${esc(GMODEL)}">
+        <datalist id="gmodels"></datalist></label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="saveKey">Save</button>
+        <button class="btn ghost" id="findModels">Find my models</button>
+        <button class="btn ghost" id="testKey">Test the connection</button>
+      </div>
+      <p class="hint" style="margin-top:14px">Get a key free at aistudio.google.com — sign in with a Google account, then <b>Get API key</b>. The free tier is generous enough for a class set, and the key is stored in this browser only. If the model name is refused, press <b>Find my models</b> and pick one from the list.</p>`:''}
+
+    ${ENGINE==='claude'?`
+      ${IN_ARTIFACT?`<p class="hint" style="max-width:66ch;margin:0">This copy runs inside Claude, which supplies the marking. On your own web address you would paste an Anthropic key here instead.</p>`:`
+      <label class="f" style="max-width:480px"><span>Anthropic API key</span>
+        <input type="password" id="akey" placeholder="sk-ant-..." value="${esc(KEYS.anthropic||'')}" autocomplete="off"></label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="saveKey">Save</button>
+        <button class="btn ghost" id="testKey">Test the connection</button>
+      </div>
+      <p class="hint" style="margin-top:14px">Create one at console.anthropic.com. This is a paid API — a class set of scripts costs cents, but it does need credit on the account.</p>`}`:''}
+
+    ${ENGINE!=='manual'?`<p class="hint" style="margin-top:14px"><b>Never paste a key into the HTML file itself.</b> Anything committed to a public GitHub repository can be read by anyone, and a leaked key gets spent by strangers. Each teacher adds their own key on their own device.</p>
+    <p class="hint" id="keyMsg" style="margin-top:8px"></p>`:''}
+  </div>
+
+  <div class="card pad" style="margin-top:16px">
+    <span class="eyebrow">How the marking works</span>
+    <h3 style="font-size:19px;margin:8px 0 10px">Read this before you trust a mark</h3>
+    <ul class="tick" style="max-width:70ch">
+      <li>Each part is judged on its own scale — Part 1 centred on A2, Part 2 on B1, Part 3 on B2 — so the same script earns different bands in different parts by design.</li>
+      <li>Content is marked on task achievement alone. A well-written script that answered the wrong question loses marks here, not under Language.</li>
+      <li>Length is never a criterion. It only shows up indirectly, when a short script cannot show enough range or a long one drifts off task.</li>
+      <li>This is a second opinion, not a substitute for standardisation. Where a band looks wrong to you, yours is the mark that counts — open the evidence panel and check the descriptor against the script yourself.</li>
+      <li>Handwriting is transcribed from a photograph, so check the transcript when a mark surprises you. A misread word can cost a band.</li>
+    </ul>
+  </div>`;
+  $('#dl').onclick=()=>{
+    const blob=new Blob([JSON.stringify({app:'bandrail',v:1,teacher:TEACHER,records:RECORDS},null,2)],{type:'application/json'});
+    dlFile(blob,`bandrail-${new Date().toISOString().slice(0,10)}.json`);
+  };
+  $('#csv').onclick=()=>{
+    const head=['Name','Class','Date','P1 Cont','P1 Comm','P1 Org','P1 Lang','P1 Total','P2 Cont','P2 Comm','P2 Org','P2 Lang','P2 Total','P3 Cont','P3 Comm','P3 Org','P3 Lang','P3 Total','Total /60','CEFR'];
+    const rows=RECORDS.map(r=>{
+      const cells=[r.name,r.klass,r.date.slice(0,10)];
+      PARTS.forEach(p=>{const s=r.parts?.[p.key]?.scores; CRIT.forEach(c=>cells.push(s?s[c.k]:'')); cells.push(s?partTotal(s):'')});
+      cells.push(recTotal(r),labelOf(recRung(r)));
+      return cells.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',');
+    });
+    dlFile(new Blob([[head.join(','),...rows].join('\n')],{type:'text/csv'}),'spm-writing-marks.csv');
+  };
+  $('#up').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const fr=new FileReader();
+    fr.onload=async()=>{
+      try{
+        const d=JSON.parse(fr.result);
+        if(!Array.isArray(d.records)) throw new Error('not a Band Rail backup');
+        const ids=new Set(d.records.map(r=>r.id));
+        RECORDS=[...RECORDS.filter(r=>!ids.has(r.id)),...d.records];
+        await saveRecords(); toast(`Restored ${d.records.length} record${d.records.length===1?'':'s'}`); drawSettings();
+      }catch(err){ toast('That file is not a Band Rail backup'); }
+    };
+    fr.readAsText(f);
+  };
+  $$('[data-eng]').forEach(btn=>btn.onclick=async()=>{
+    ENGINE=btn.dataset.eng; await saveEngine(); drawSettings();
+    toast(ENGINE==='manual'?'Switched to marking by hand':'Add the key below to finish setting this up');
+  });
+  const readKeys=()=>{ if($('#gkey')) KEYS.gemini=$('#gkey').value.trim();
+                       if($('#akey')) KEYS.anthropic=$('#akey').value.trim();
+                       if($('#gmodel')) GMODEL=$('#gmodel').value.trim()||GMODEL; };
+  if($('#saveKey')) $('#saveKey').onclick=async()=>{ readKeys(); await saveEngine(); drawSettings(); toast('Saved on this device'); };
+  if($('#findModels')) $('#findModels').onclick=async()=>{
+    readKeys(); const msg=$('#keyMsg');
+    if(!KEYS.gemini) return toast('Paste the key first');
+    msg.innerHTML='<span class="mono">Asking Google which models your key can use…</span>';
+    try{
+      const list=await listGeminiModels();
+      $('#gmodels').innerHTML=list.map(m=>`<option value="${esc(m)}">`).join('');
+      const flash=list.find(m=>/flash/.test(m)&&!/lite|preview/.test(m))||list[0];
+      if(flash){ $('#gmodel').value=flash; GMODEL=flash; await saveEngine(); }
+      msg.innerHTML=`<b style="color:var(--ok)">${list.length} models available.</b> Using <span class="mono">${esc(GMODEL)}</span> — tap the model box to see the rest.`;
+    }catch(e){ msg.innerHTML='<b style="color:#c02a20">'+esc(e.message==='BAD_KEY'?'That key was rejected by Google.':e.message)+'</b>'; }
+  };
+  if($('#testKey')) $('#testKey').onclick=async()=>{
+    readKeys(); const msg=$('#keyMsg');
+    msg.innerHTML='<span class="mono">Testing…</span>';
+    try{
+      await callAI([{type:'text',text:'Reply with only this JSON and nothing else: {"ok":true}'}],200);
+      await saveEngine();
+      msg.innerHTML='<b style="color:var(--ok)">Connected. Marking will work now.</b>';
+    }catch(e){
+      msg.innerHTML='<b style="color:#c02a20">'+esc(
+        e.message==='BAD_KEY'?'The key was rejected — check it was copied in full and the account is active.':
+        e.message==='NO_REACH'?'Could not reach the service from this network.':
+        e.message==='NO_KEY'?'Paste the key first.':e.message)+'</b>';
+    }
+  };
+  $('#out').onclick=async()=>{ await store.set(K_T,null); TEACHER=null; location.reload(); };
+}
+async function saveEngine(){ await store.set(K_E,{engine:ENGINE,keys:KEYS,model:GMODEL}); }
+
+function dlFile(blob,name){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500); toast('Saved to your downloads — move it into Drive');
+}
+
+/* =====================================================================
+   FULL-MARK MODEL ANSWERS
+   Written against the band-5 descriptor for that part — not showier than
+   the scale asks for, because a Part 1 sample that reads like C1 teaches
+   a Form 5 candidate nothing they can copy.
+   ===================================================================== */
+function sampleBlock(p){
+  const rec=CURRENT.parts[p.key]||{};
+  const sample=rec.sample;
+  if(!sample) return `<div class="card pad" style="background:linear-gradient(120deg,rgba(255,176,32,.10),rgba(18,168,207,.07));border:1px dashed #c9d2e8">
+    <span class="eyebrow">Model answer</span>
+    <h3 style="font-size:19px;margin:8px 0 6px">${p.n===3?'Full-mark samples for all three questions':'A full-mark sample for this question'}</h3>
+    <p class="hint" style="max-width:64ch;margin-bottom:12px">Written from the question itself, at exactly the level band 5 asks for on the Part ${p.n} scale${p.n===3?' — one for the article, one for the review or report, one for the story, so the class can study every option, not only the one they picked':''}. Students get the plan behind it and the phrases worth stealing.</p>
+    ${SHOTS[p.key].q.length?'':`<label class="f" style="max-width:640px"><span>Type or paste the question (needed when you have no photo of the question paper)</span>
+      <textarea id="qText" rows="${p.n===3?5:3}" placeholder="${p.n===3?'Question 3: ...\nQuestion 4: ...\nQuestion 5: ...':'Copy the task and its bullet points here.'}">${esc(rec.questionText||'')}</textarea></label>`}
+    <button class="btn sm" id="mkSample" style="background:${p.colour}">${p.n===3?'Write all three samples':'Write the sample'}</button>
+    ${ENGINE==='manual'?`<p class="hint" style="margin-top:10px">This one needs a marking engine — it is writing, not scoring. Switch to Gemini or Claude under Backup.</p>`:''}
+  </div>`;
+  const list=p.n===3?(sample.samples||[]):[sample];
+  return `<div class="card pad" style="border-top:4px solid ${p.colour}">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="margin-right:auto"><span class="eyebrow">Model answer${list.length>1?'s':''} · band 5 on every sub-scale</span>
+      <h3 style="font-size:19px;margin:6px 0 0">${p.n===3?'All three questions':esc(sample.task||p.label)}</h3></div>
+      <button class="btn ghost sm" id="mkSample">Write it again</button>
+    </div>
+    ${list.map((x,i)=>modelCard(p,x,i)).join('')}
+  </div>`;
+}
+function modelCard(p,x,i){
+  return `<div style="margin-top:16px;border-top:1px solid var(--line);padding-top:16px">
+    ${x.option?`<div class="mono" style="font-size:11.5px;color:${p.colour};margin-bottom:8px">${esc(x.option)}</div>`:''}
+    ${x.task&&x.option?`<p class="hint" style="margin:0 0 10px">${esc(x.task)}</p>`:''}
+    ${(x.plan||[]).length?`<div class="quote" style="border-color:${p.colour}"><b>The plan behind it:</b> ${x.plan.map(t=>esc(t)).join(' → ')}</div>`:''}
+    <div style="background:#fbfcff;border:1px solid var(--line);border-radius:14px;padding:16px;white-space:pre-wrap;line-height:1.75;font-size:15px" id="sample-${p.key}-${i}">${esc(x.answer||'')}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <span class="pill" style="background:var(--paper)">${x.wordCount||'—'} words</span>
+      <button class="btn ghost sm" data-copy="sample-${p.key}-${i}">Copy</button>
+    </div>
+    <div style="margin-top:12px">
+      ${CRIT.map(c=>`<details class="accordion"><summary><span style="width:9px;height:9px;border-radius:3px;background:${c.c};display:inline-block"></span>Why this is a 5 for ${c.name}</summary>
+        <div class="body">${esc(x.whyFull?.[c.k]||'—')}</div></details>`).join('')}
+    </div>
+    ${(x.phrases||[]).length?`<div style="margin-top:10px"><span class="eyebrow">Phrases worth stealing</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${x.phrases.map(f=>`<span class="pill" style="background:var(--paper);font-size:13px;padding:7px 12px" title="${esc(f.use||'')}">${esc(f.phrase||f)}</span>`).join('')}</div></div>`:''}
+  </div>`;
+}
+function wireSample(p){
+  if($('#mkSample')) $('#mkSample').onclick=()=>makeSample(p);
+  $$('[data-copy]').forEach(b=>b.onclick=()=>{
+    const t=$('#'+b.dataset.copy)?.innerText||'';
+    navigator.clipboard.writeText(t).then(()=>toast('Copied'),()=>toast('Select the text to copy it'));
+  });
+}
+async function makeSample(p){
+  const typed=$('#qText')?.value.trim()||CURRENT.parts[p.key]?.questionText||'';
+  if(!SHOTS[p.key].q.length && !typed) return toast('Photograph the question, or type it in the box');
+  const zone=$('#sampleZone');
+  zone.innerHTML=`<div class="working"><div class="spin" style="border-color:rgba(16,19,52,.2);border-top-color:${p.colour}"></div>
+    <div><b>Writing ${p.n===3?'three full-mark answers':'the full-mark answer'}…</b><div class="hint">Aiming at band 5 on the Part ${p.n} scale — no higher, so the class can actually copy the moves.</div></div></div>`;
+
+  const shape = p.n===3
+   ? `{"samples":[{"option":"Question 3 — <genre>: <short title of the task>","task":"one line on what that question asks for","plan":["the 3-4 planning points this answer follows"],"answer":"the model answer, \\n between paragraphs","wordCount":<number>,"whyFull":{"content":"...","communicative":"...","organisation":"...","language":"..."},"phrases":[{"phrase":"...","use":"when a student would use it"}]}]}
+Give exactly one entry per question on the paper, in question order.`
+   : `{"task":"one line on what this question asks for","plan":["the 3-4 planning points this answer follows"],"answer":"the model answer, \\n between paragraphs","wordCount":<number>,"whyFull":{"content":"...","communicative":"...","organisation":"...","language":"..."},"phrases":[{"phrase":"...","use":"when a student would use it"}]}`;
+
+  const prompt=`You are a senior SPM English Writing examiner writing model answers for classroom use — Paper 1119/2, Part ${p.n} (${p.task}, ${p.words}).
+
+${SCALE_TEXT[p.key]}
+
+${EXAMINER_RULES}
+
+${CONTEXT_NOTE}
+
+Write ${p.n===3?'a model answer for EVERY question offered in Part 3 on this paper (there are three)':'a model answer for the question shown'}. Each one must score 5 for Content, 5 for Communicative Achievement, 5 for Organisation and 5 for Language on the Part ${p.n} scale.
+
+Hard rules:
+- Answer the question actually set. Cover every bullet or question in the prompt.
+- Hit the word count for this part. Do not run long: an over-length answer loses marks for relevance.
+- Write at the level band 5 on THIS part demands and no higher. A Part 1 sample that reads like a C1 essay is useless to a Form 5 class — for Part 1 keep it to controlled simple grammar, everyday vocabulary and simple connectors used well.
+- Use Malaysian school-life detail a student here would recognise, and British spelling.
+- No fancy vocabulary a candidate could not plausibly produce under exam conditions.
+- In "whyFull", quote the actual phrase from your answer that earns the band, and name the descriptor it meets.
+
+Reply with JSON only, no other text:
+${shape}`;
+
+  const content=[{type:'text',text:prompt}];
+  if(typed) content.push({type:'text',text:'THE QUESTION AS TYPED BY THE TEACHER:\n'+typed});
+  imgBlocks(SHOTS[p.key].q,'QUESTION PAPER:').forEach(b=>content.push(b));
+  try{
+    const out=await callAI(content, p.n===3?6000:2500);
+    CURRENT.parts[p.key]={...(CURRENT.parts[p.key]||{}), sample:out, questionText:typed||undefined};
+    drawPart(p); toast('Sample ready — the class can study it');
+  }catch(e){
+    zone.innerHTML=failureCard(e)+`<div style="margin-top:10px"><button class="btn ghost sm" onclick="drawPart(PARTS[STEP-1])">Back</button></div>`;
+  }
+}
+
+/* =====================================================================
+   MARKING BY HAND — the descriptors, laid out as a band grid
+   The three scales share one ladder, so band 5 on Part 1, band 3 on
+   Part 2 and band 1 on Part 3 are the same descriptor.
+   ===================================================================== */
+const TIER={
+ communicative:{
+  A:'Isolated short units about simple, concrete matters; does not always get the message across.',
+  B:'Communicates simple ideas in simple ways.',
+  C:'Communicates straightforward ideas, using the conventions of the task reasonably appropriately.',
+  D:'Uses the conventions of the task to hold the reader\u2019s attention and put straightforward ideas across appropriately.',
+  E:'Uses the conventions effectively to hold attention and communicate with ease, meeting every communicative purpose.'},
+ organisation:{
+  A:'Unlikely to be connected; the odd full stop or "and".',
+  B:'Connected with basic, high-frequency connectors.',
+  C:'Simple connectors plus a limited number of cohesive devices, used appropriately.',
+  D:'Generally well organised and coherent, with a variety of cohesive devices.',
+  E:'Well organised and coherent; a variety of cohesive devices used to generally good effect.'},
+ language:{
+  A:'Isolated words and phrases; very few simple forms, limited control.',
+  B:'Basic vocabulary used reasonably; simple forms with some control; errors sometimes block meaning.',
+  C:'Basic vocabulary used appropriately; simple forms with good control; errors noticeable but meaning still gets through.',
+  D:'A range of everyday vocabulary with occasional misuse of less common words; simple plus some complex forms, good control; errors do not block communication.',
+  E:'A range of vocabulary including less common lexis, used appropriately; simple and complex forms with control and flexibility; occasional slips.'}
+};
+const CONTENT_D={5:'All content relevant to the task; the target reader is fully informed.',
+                 3:'Minor irrelevance or omission; the reader is informed on the whole.',
+                 1:'Irrelevance or a misreading of the task; the reader is only minimally informed.',
+                 0:'Content wholly irrelevant; the reader is not informed.'};
+const PART_TIERS={p1:{1:'A',3:'B',5:'C'},p2:{1:'B',3:'C',5:'D'},p3:{1:'C',3:'D',5:'E'}};
+function descFor(partKey,crit,band){
+  if(band===0) return crit==='content'?CONTENT_D[0]:'Below band 1.';
+  if(band===2||band===4) return 'Shares features of band '+(band-1)+' and band '+(band+1)+'.';
+  return crit==='content'?CONTENT_D[band]:TIER[crit][PART_TIERS[partKey][band]];
+}
+
+function handPanel(p){
+  const cur=CURRENT.parts[p.key]?.scores||{};
+  const set=CURRENT.parts[p.key]?.byHand;
+  return `<details class="accordion" style="margin-top:18px" ${ENGINE==='manual'||set?'open':''}>
+    <summary style="border-left:4px solid ${p.colour}">${ENGINE==='manual'?'Award the bands':'Adjust the bands yourself'} — Part ${p.n}</summary>
+    <div class="body">
+      <p class="hint" style="margin:0 0 14px">Read the script, then tap the band that best describes it on each sub-scale. The descriptor under each row is the one you are awarding.</p>
+      ${CRIT.map(c=>`<div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <b style="font-size:13.5px;min-width:130px">${c.name}</b>
+          <div style="display:flex;gap:5px">${[0,1,2,3,4,5].map(n=>
+            `<button class="chip band" data-band="${c.k}:${n}" aria-pressed="${cur[c.k]===n}" style="width:38px;text-align:center;font-family:var(--mono);font-weight:600;${cur[c.k]===n?'background:'+c.c+';border-color:'+c.c+';color:#fff':''}">${n}</button>`).join('')}</div>
+        </div>
+        <p class="hint" id="desc-${c.k}" style="margin:7px 0 0 0;padding-left:2px">${esc(descFor(p.key,c.k,cur[c.k]??3))}</p>
+      </div>`).join('')}
+      <label class="f" style="margin-top:6px"><span>Your note on this part (optional)</span>
+        <textarea id="handNote" rows="3" placeholder="What you saw in the script — this appears in the report.">${esc(CURRENT.parts[p.key]?.teacherNote||'')}</textarea></label>
+      <button class="btn sm" id="handSave" style="background:${p.colour}">Save these bands</button>
+    </div></details>`;
+}
+function wireHand(p){
+  const pick={...(CURRENT.parts[p.key]?.scores||{})};
+  $$('[data-band]').forEach(b=>b.onclick=ev=>{
+    ev.preventDefault();
+    const [k,n]=b.dataset.band.split(':'); pick[k]=+n;
+    $$(`[data-band^="${k}:"]`).forEach(o=>{
+      const on=o.dataset.band===b.dataset.band;
+      o.setAttribute('aria-pressed',String(on));
+      const c=CRIT.find(c=>c.k===k);
+      o.style.cssText=`width:38px;text-align:center;font-family:var(--mono);font-weight:600;`+(on?`background:${c.c};border-color:${c.c};color:#fff`:'');
+    });
+    $('#desc-'+k).textContent=descFor(p.key,k,+n);
+  });
+  if($('#handSave')) $('#handSave').onclick=()=>{
+    const scores={}; CRIT.forEach(c=>scores[c.k]=pick[c.k]??0);
+    const prev=CURRENT.parts[p.key]||{};
+    CURRENT.parts[p.key]={...prev,scores,byHand:true,teacherNote:$('#handNote').value.trim(),
+      taskRead:prev.taskRead||'Marked by hand by the examiner.'};
+    if(p.n===3) CURRENT.parts.p3.genre=CURRENT.genre;
+    drawPart(p); toast(`Part ${p.n}: ${partTotal(scores)}/20 recorded`);
+  };
+}
+
+/* =====================================================================
+   INTERVENTION WITHOUT AN AI — built from the sub-scale you marked lowest
+   ===================================================================== */
+const LIB={
+ content:{words:['because','for example','in my opinion','I would suggest','the reason is','what I mean is'],
+  low:{gap:'The script does not answer what was asked. Points in the question are missed, or a different question is answered.',
+   target:'Every bullet in the task answered, in order, with one supporting detail each.',
+   acts:['Underline every question word in the task and number them 1, 2, 3. Write one sentence per number before writing anything else.',
+    'Give the candidate three past prompts and ask only for the plan — the numbered points, no essay. Two minutes each.',
+    'Swap scripts with a partner: can the partner find all three answers? If not, the writer adds the missing one.',
+    'Rewrite last week\u2019s weakest paragraph so that it answers the actual prompt.']},
+  mid:{gap:'The points are there but thin — one is answered in passing, or a reason is missing.',
+   target:'Each point developed with a reason or an example, so the reader is fully informed.',
+   acts:['Point-Reason-Example drill: take each answer sentence and add "because…" then "for example…".',
+    'Set a 10-minute rewrite of one weak paragraph only, adding a reason to every claim.',
+    'Read a band 5 answer aloud and ask the class to mark where the reason arrives in each point.']},
+  high:{gap:'Content is under control; the remaining loss comes from small omissions under time pressure.',
+   target:'All points fully covered even in the last five minutes of the paper.',
+   acts:['Timed Part 3 with two minutes forced planning before writing.',
+    'Checklist habit: tick each task bullet on the question paper as it is answered.']}},
+ communicative:{words:['Dear Sir/Madam','Hi there','I am writing to','Would you like to','I hope to hear from you','All the best'],
+  low:{gap:'The writing does not sound like the text type asked for — an email that reads like notes, an article with no reader in mind.',
+   target:'The genre is recognisable from the first line: right opening, right tone, right ending.',
+   acts:['Genre sort: cut up openings and endings from emails, articles, reviews and reports; the class matches them to the text type.',
+    'Write only the first two lines and the last two lines of an email to a friend. Nothing else. Five times.',
+    'Rewrite one formal paragraph as a message to a friend, then back again, to feel the register change.']},
+  mid:{gap:'The conventions are followed but the writing does not hold the reader — it informs without engaging.',
+   target:'An opening that makes the reader continue, and a purpose met in every paragraph.',
+   acts:['Hook practice: three different opening lines for the same article; the class votes on which one they would keep reading.',
+    'Label each paragraph with its communicative purpose (describe, recommend, persuade). Any paragraph without one gets cut.',
+    'Review-writing with a required recommendation sentence at the end.']},
+  high:{gap:'Register and purpose are handled well; the remaining gap is flexibility across genres.',
+   target:'The same content rewritten convincingly as a report and as a story.',
+   acts:['One topic, two genres, 15 minutes each.','Peer-mark against the Part 3 conventions only, ignoring language.']}},
+ organisation:{words:['first of all','after that','however','as a result','on the other hand','in addition','to sum up','this is because'],
+  low:{gap:'The writing runs on. Ideas arrive in the order they were thought of, joined mainly by "and" or by commas.',
+   target:'Clear paragraphs, full stops in the right places, and a linking word opening each new idea.',
+   acts:['Chop a run-on paragraph into correct sentences with a red pen — no rewriting, just punctuation.',
+    'Three-paragraph frame: opening, two body points, closing. Fill it with single sentences first.',
+    'Linker bank on the wall; every piece of writing must use three different ones, never the same one twice.']},
+  mid:{gap:'Paragraphs exist and simple connectors are used, but the same two or three keep repeating and the links between ideas are loose.',
+   target:'A variety of cohesive devices — reference words, "as a result", "on the other hand" — not just "and" and "then".',
+   acts:['Ban "and then" and "next" for one piece of writing. The class finds replacements first.',
+    'Reference-word drill: rewrite a paragraph replacing repeated nouns with "it", "this", "the latter".',
+    'Give a scrambled model answer; the class reorders it and explains which words gave the order away.']},
+  high:{gap:'Organisation is sound; what is missing is shape — paragraphs that build rather than list.',
+   target:'A closing that answers the opening, and cohesive devices used for effect rather than decoration.',
+   acts:['Rewrite the last paragraph so it echoes the first line.','Mark a model answer for cohesive devices and count them per paragraph.']}},
+ language:{words:['I would rather','It is important to','not only… but also','although','instead of','manage to','a wide range of','I strongly believe'],
+  low:{gap:'Basic vocabulary and simple sentences, with repeated grammar errors — tense, subject-verb agreement or plurals — that slow the reader down.',
+   target:'Simple sentences under control, with the repeated error corrected on sight.',
+   acts:['Error log: one page in the exercise book, three columns — what I wrote, what it should be, the rule. Added to after every piece.',
+    'Ten-sentence tense drill built from the candidate\u2019s own mistakes, not from a textbook.',
+    'Dictation of six short sentences twice a week, corrected in pairs.',
+    'Sentence expansion: start with "I went to the shop", add when, why and with whom.']},
+  mid:{gap:'Everyday vocabulary is in place, but the sentences stay short and the same words keep coming back.',
+   target:'Some complex sentences — although, because, which — and a more precise word where a vague one was used.',
+   acts:['Sentence-combining: join every two short sentences with although, because, which or after.',
+    'Upgrade five words per script: happy to delighted, big to significant — but only where it still sounds natural.',
+    'Read a model paragraph and steal three phrases into the word bank for next week.']},
+  high:{gap:'Range is good; accuracy under time pressure and precision of word choice are what cost the last band.',
+   target:'Complex forms held together in a timed script, with less common lexis used appropriately.',
+   acts:['Timed 250-word Part 3, then self-correct for ten minutes with the error log open.',
+    'Collocation work: which words actually go with the less common ones being attempted.']}}
+};
+function levelOf(v){ return v<=2?'low':v<=3.5?'mid':'high'; }
+
+function localReport(rec){
+  const marked=PARTS.filter(p=>rec.parts?.[p.key]?.scores);
+  const per=CRIT.map(c=>({...c, v:avg(marked.map(p=>rec.parts[p.key].scores[c.k]))})).sort((a,b)=>a.v-b.v);
+  const weakest=per[0], second=per[1], best=per[per.length-1];
+  const rung=recRung(rec), total=recTotal(rec);
+  const L=k=>LIB[k.k][levelOf(k.v)];
+  const notes=marked.map(p=>rec.parts[p.key].teacherNote).filter(Boolean);
+
+  const priorities=[weakest,second].map(c=>({
+    criterion:c.name, gap:L(c).gap, target:L(c).target,
+    why:`Averaging ${r1(c.v)} of 5 across the paper — the lowest of the four sub-scales, so a single band gained here is worth ${marked.length} marks.`
+  }));
+  priorities.push({criterion:'Across the paper',
+    gap:`Part ${marked.map(p=>({n:p.n,t:partTotal(rec.parts[p.key].scores)})).sort((a,b)=>a.t-b.t)[0].n} scored lowest of the tasks attempted.`,
+    target:'One full timed attempt at that task each week until it stops being the weakest.',
+    why:'The extended task carries the same 20 marks as the email but is where weaker candidates lose the most.'});
+
+  const w=L(weakest), sc=L(second);
+  const plan=[
+    {week:'Week 1',focus:weakest.name+' — the habit',activities:w.acts.slice(0,2),check:'The same task redone at the end of the week shows the habit without being reminded.'},
+    {week:'Week 2',focus:weakest.name+' into '+second.name,activities:[w.acts[2]||w.acts[0],sc.acts[0]],check:'Peer-marking on those two sub-scales only, using the descriptors.'},
+    {week:'Week 3',focus:'Put it back into a full script',activities:[sc.acts[1]||sc.acts[0],`One timed Part ${marked.length?marked[marked.length-1].n:2} in exam conditions, then self-correction against the band descriptors.`],check:'Re-mark with the same grid — look for one band up on '+weakest.name+'.'}
+  ];
+  const lowPart=marked.map(p=>({p,t:partTotal(rec.parts[p.key].scores)})).sort((a,b)=>a.t-b.t)[0].p;
+  return {
+    diagnosis:`${rec.name} scored ${total} of 60, which places this paper at ${labelOf(rung)}. ${best.name} is the strongest sub-scale at ${r1(best.v)} of 5, so there is something to build on. ${weakest.name} is the drag at ${r1(weakest.v)} of 5, and it repeats across the tasks rather than being a one-off in a single part. ${lowPart.label} was the weakest task${notes.length?' — your own note on it: "'+notes[0]+'"':''}. Fix ${weakest.name.toLowerCase()} first: it is the cheapest band to gain and it lifts every part of the paper at once.`,
+    priorities, plan,
+    drill:{title:`Rewrite one paragraph for ${weakest.name.toLowerCase()}`,
+      instructions:`Take the weakest paragraph from your ${lowPart.label.split('·')[1].trim()} and write it again. Change nothing about the topic. ${w.target} Hand in both versions, old on the left, new on the right.`,
+      successCriteria:[w.target,'The new version is not longer than the old one — it is clearer.','Every change can be explained out loud in one sentence.']},
+    toStudent:`You scored ${total} out of 60. Your best area is ${best.name.toLowerCase()} — that part is working, so keep doing it. The one thing to change now is ${weakest.name.toLowerCase()}: ${w.target.toLowerCase()} Do not try to fix everything at once. Work on this one thing for two weeks and your marks will move.`,
+    wordBank:LIB[weakest.k].words,
+    madeBy:'hand'
+  };
+}
+
+/* =====================================================================
+   THE REPAIR ROOM
+   The report says what is wrong. This is where the student does something
+   about it: their own errors, their own sentences, one band at a time.
+   ===================================================================== */
+let PRAC=null;
+
+function weakestOf(rec){
+  const marked=PARTS.filter(p=>rec.parts?.[p.key]?.scores);
+  return CRIT.map(c=>({...c,v:avg(marked.map(p=>rec.parts[p.key].scores[c.k]))})).sort((a,b)=>a.v-b.v)[0];
+}
+const INSTRUCTION={
+  content:{do:'Add the missing reason. Write the sentence again so it says WHAT you think and WHY.',
+    steps:['Keep your original point word for word.','Add "because" and finish the thought.','Add one example a reader could picture.'],
+    criteria:['The point is still there','A reason follows it','One concrete example, not a general one']},
+  communicative:{do:'Rewrite it so it sounds like the text type the question asked for.',
+    steps:['Decide who is reading it — a friend, a magazine reader, a teacher.','Change the opening words to suit that reader.','Cut anything that belongs to a different text type.'],
+    criteria:['A reader could name the text type from this line alone','The tone matches that reader','Nothing formal left in an informal piece, or the reverse']},
+  organisation:{do:'Join these ideas properly. Open with a linking word and connect the second idea to the first.',
+    steps:['Choose a linker that matches the relationship: however, as a result, in addition, on the other hand.','Use "this", "it" or "they" instead of repeating the same noun.','Check the full stops — one idea, one sentence.'],
+    criteria:['A linker that fits the meaning, not just "and"','One reference word replacing a repeated noun','Correct full stops and capital letters']},
+  language:{do:'Rewrite it as one longer, correct sentence.',
+    steps:['Join the two short sentences with although, because, which or after.','Check the tense is the same all the way through.','Swap one vague word for a more exact one.'],
+    criteria:['One sentence, correctly joined','Tense consistent','One word upgraded and still natural']}
+};
+
+function buildDeck(rec){
+  const deck=[], w=weakestOf(rec);
+  const marked=PARTS.filter(p=>rec.parts?.[p.key]?.scores);
+  // 1. their own errors
+  marked.forEach(p=>{
+    (rec.parts[p.key].errors||[]).slice(0,4).forEach((e,i)=>{
+      if(!e.wrote||!e.fix) return;
+      deck.push({id:`fix-${p.key}-${i}`,kind:'fix',part:p,title:`Correct your own ${e.type||'error'}`,
+        given:e.wrote,key:e.fix,
+        guidance:e.systematic?'You made this mistake more than once, so it is a rule you have not learned yet — not a slip. Learn it here and it stops costing you marks in every part.'
+                              :'This one appeared once. Fix it, say the rule out loud, and move on.',
+        instruction:'Write the sentence correctly.'});
+    });
+  });
+  // 2. upgrade their own sentences on the weakest sub-scale
+  const ins=INSTRUCTION[w.k];
+  marked.forEach(p=>{
+    const t=rec.parts[p.key].transcript||'';
+    (t.split(/[.!?]+/).map(x=>x.trim()).filter(x=>x.length>25).sort((a,b)=>b.length-a.length).slice(0,2))
+      .forEach((sent,i)=>deck.push({id:`up-${p.key}-${i}`,kind:'upgrade',part:p,crit:w,
+        title:`${w.name}: rebuild your own sentence`,given:sent,
+        guidance:`Band ${Math.min(5,(rec.parts[p.key].scores?.[w.k]??0)+1)} on ${p.label} asks for: ${descFor(p.key,w.k,Math.min(5,(rec.parts[p.key].scores?.[w.k]??0)+1))}`,
+        instruction:ins.do,steps:ins.steps,criteria:ins.criteria}));
+  });
+  // 3. the full rewrite
+  // 2b. nothing candidate-specific to work from (hand-marked, no transcript)?
+  //     fall back to targeted work on the weakest sub-scale rather than an empty room.
+  if(!deck.some(x=>x.kind==='upgrade')){
+    const acts=LIB[w.k][levelOf(w.v)].acts.slice(0,2);
+    acts.forEach((a,i)=>deck.push({id:`gen-${i}`,kind:'upgrade',crit:w,
+      title:`${w.name}: ${levelOf(w.v)==='low'?'build the habit':'sharpen it'}`,given:'',
+      guidance:`This candidate averages ${r1(w.v)} of 5 for ${w.name.toLowerCase()}. The next band up asks for: ${descFor('p2',w.k,Math.min(5,Math.round(w.v)+1))}`,
+      instruction:a,steps:INSTRUCTION[w.k].steps,criteria:INSTRUCTION[w.k].criteria}));
+  }
+  const drill=(rec.report&&rec.report.drill)||localReport(rec).drill;
+  if(drill) deck.push({id:'drill',kind:'rewrite',crit:w,title:drill.title,given:'',
+    guidance:'This is the piece that moves the band. Everything above was practice for it.',
+    instruction:drill.instructions,criteria:drill.successCriteria||[]});
+  return deck.slice(0,12);
+}
+
+function openPractice(id){
+  const rec=RECORDS.find(r=>r.id===id); if(!rec) return;
+  PRAC={rec,deck:buildDeck(rec),i:0,log:{...(rec.practice||{})}};
+  if(!PRAC.deck.length){
+    $('#v-practice').innerHTML=`<div class="empty card pad"><b>Nothing to repair yet</b>
+      Mark at least one part for ${esc(rec.name)} first — the exercises are built out of that candidate's own sentences and errors.
+      <div style="margin-top:14px"><button class="btn ghost sm" onclick="openReport('${rec.id}')">Back to the report</button></div></div>`;
+    return go('practice');
+  }
+  drawPractice(); go('practice');
+}
+
+function drawPractice(){
+  const {rec,deck,i,log}=PRAC, it=deck[i], w=weakestOf(rec);
+  const doneN=Object.keys(log).length, prev=log[it.id];
+  $('#v-practice').innerHTML=`
+  <div class="noprint" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn ghost sm" onclick="openReport('${rec.id}')">← Back to the report</button>
+    <button class="btn ghost sm" onclick="printWorksheet('${rec.id}')">Print as a worksheet</button>
+  </div>
+  <div class="card" style="overflow:hidden;margin-bottom:16px">
+    <div style="padding:20px 24px;background:linear-gradient(120deg,#101334,#2b3060);color:#fff">
+      <div class="eyebrow" style="color:#9fb4e8">Repair room · ${esc(rec.name)}</div>
+      <h2 style="font-size:26px;margin:8px 0 6px">Working on ${w.name.toLowerCase()}</h2>
+      <p style="margin:0;color:#c9d3f2;font-size:14px">${doneN} of ${deck.length} done · exercise ${i+1}</p>
+      <div class="meter" style="height:8px;margin-top:12px;background:rgba(255,255,255,.18)"><i style="width:${doneN/deck.length*100}%;background:var(--mango)"></i></div>
+    </div>
+  </div>
+
+  <div class="card pad" style="border-top:4px solid ${it.part?it.part.colour:'var(--plum)'}">
+    <span class="eyebrow">${it.kind==='fix'?'Correct it':it.kind==='upgrade'?'Rebuild it':'Write it again'}${it.part?' · '+it.part.label:''}</span>
+    <h3 style="font-size:21px;margin:8px 0 10px">${esc(it.title)}</h3>
+    <p class="hint" style="line-height:1.6;margin-bottom:14px">${esc(it.guidance)}</p>
+    ${it.given?`<div class="quote" style="border-color:var(--p3);font-size:15px"><b>You wrote:</b> ${esc(it.given)}</div>`:''}
+    <p style="font-weight:600;font-size:15px;margin:14px 0 6px">${esc(it.instruction)}</p>
+    ${(it.steps||[]).length?`<ul class="tick" style="margin-bottom:10px">${it.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    <textarea id="ans" rows="${it.kind==='rewrite'?8:3}" placeholder="Write your answer here.">${esc(prev?.answer||'')}</textarea>
+    ${(it.criteria||[]).length?`<div style="margin-top:12px"><span class="eyebrow">It counts when</span>
+      <ul class="tick">${it.criteria.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+    <div id="verdict" style="margin-top:14px">${prev?verdictCard(prev):''}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="btn" id="check" style="background:${it.part?it.part.colour:'var(--plum)'}">Check my answer</button>
+      ${it.kind==='fix'?`<button class="btn ghost" id="reveal">Show me the correction</button>`:''}
+      ${i>0?`<button class="btn ghost" id="back">← Previous</button>`:''}
+      ${i<deck.length-1?`<button class="btn ghost" id="fwd" style="margin-left:auto">Skip →</button>`
+        :`<button class="btn ghost" id="fin" style="margin-left:auto">Finish</button>`}
+    </div>
+  </div>`;
+
+  $('#check').onclick=()=>checkItem();
+  if($('#reveal')) $('#reveal').onclick=()=>{
+    $('#verdict').innerHTML=`<div class="card pad" style="background:#f4fbf8;border-color:#bfe5d5">
+      <b>The correction:</b> <span style="color:var(--ok);font-weight:600">${esc(it.key)}</span>
+      <p class="hint" style="margin:8px 0 0">Copy it out once by hand, then say what changed in your own words. Copying without saying the rule teaches nothing.</p></div>`;
+  };
+  if($('#back')) $('#back').onclick=()=>{PRAC.i--;drawPractice()};
+  if($('#fwd')) $('#fwd').onclick=()=>{PRAC.i++;drawPractice()};
+  if($('#fin')) $('#fin').onclick=()=>finishPractice();
+}
+
+function norm(t){ return (t||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim(); }
+function verdictCard(v){
+  const c=v.ok==='yes'?'var(--ok)':v.ok==='nearly'?'var(--mango)':'var(--p3)';
+  const t=v.ok==='yes'?'That works.':v.ok==='nearly'?'Nearly — one thing to change.':'Not yet.';
+  return `<div class="card pad" style="border-color:${c}55;background:${c}0f">
+    <b style="color:${c}">${t}</b>
+    <p style="margin:8px 0 0;font-size:14.5px;line-height:1.6">${esc(v.feedback||'')}</p>
+    ${v.better?`<div class="quote" style="border-color:${c};margin-top:10px"><b>One way to write it:</b> ${esc(v.better)}</div>`:''}</div>`;
+}
+
+async function checkItem(){
+  const {deck,i,rec}=PRAC, it=deck[i];
+  const ans=$('#ans').value.trim();
+  if(!ans) return toast('Write your answer first');
+  const V=$('#verdict');
+
+  if(it.kind==='fix'){
+    const ok=norm(ans)===norm(it.key);
+    const close=!ok && norm(ans).includes(norm(it.key).split(' ').slice(-2).join(' '));
+    const v={ok:ok?'yes':close?'nearly':'no',answer:ans,
+      feedback: ok?'Exactly the correction the examiner would make. Say the rule out loud once, then move on.'
+        : close?'You have changed the right part but not quite to the right form. Look at the ending of the word.'
+        : 'Not the correction yet. Read your version and the original side by side — what is different, and is the difference the thing that was wrong?'};
+    if(!ok && ENGINE!=='manual'){
+      try{
+        const j=await callAI([{type:'text',text:`An SPM candidate wrote: "${it.given}". The correct version is: "${it.key}". The student's attempt: "${ans}".
+Is the attempt acceptable English that fixes the original error? Reply JSON only: {"ok":"yes|nearly|no","feedback":"one or two sentences to the student, naming the rule in plain English","better":"the corrected sentence"}`}],400);
+        Object.assign(v,{ok:j.ok||v.ok,feedback:j.feedback||v.feedback,better:j.better});
+      }catch(e){}
+    }
+    return record(v);
+  }
+
+  if(ENGINE==='manual'){
+    return record({ok:'nearly',answer:ans,
+      feedback:'No marking engine is connected, so check it against the list above yourself: read your sentence once for each point and tick it only if it is really there. Then show it to your teacher.'});
+  }
+  V.innerHTML=`<div class="working"><div class="spin" style="border-color:rgba(16,19,52,.2);border-top-color:var(--plum)"></div><div><b>Reading your answer…</b></div></div>`;
+  try{
+    const j=await callAI([{type:'text',text:`You are an SPM English teacher giving feedback on one short exercise. Be encouraging but honest, and write to a Malaysian Form 5 student in simple English.
+
+The task given: ${it.instruction}
+${it.given?'What the student originally wrote: "'+it.given+'"':''}
+It counts as done when: ${(it.criteria||[]).join('; ')}
+The student's attempt: "${ans}"
+
+Judge only against those criteria. Do not ask for more than the task asked. Reply JSON only:
+{"ok":"yes|nearly|no","feedback":"2-3 sentences: what they got right, then the one thing to change. Name the criterion.","better":"one model version of their sentence, keeping their own idea"}`}],700);
+    record({ok:j.ok||'nearly',answer:ans,feedback:j.feedback||'',better:j.better});
+  }catch(e){
+    V.innerHTML=failureCard(e);
+  }
+}
+
+async function record(v){
+  PRAC.log[PRAC.deck[PRAC.i].id]=v;
+  PRAC.rec.practice=PRAC.log;
+  RECORDS=RECORDS.map(r=>r.id===PRAC.rec.id?PRAC.rec:r);
+  await saveRecords();
+  drawPractice();
+  $('#verdict').innerHTML=verdictCard(v);
+  if($('#verdict').scrollIntoView) $('#verdict').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function finishPractice(){
+  const {rec,deck,log}=PRAC;
+  const done=Object.values(log), good=done.filter(v=>v.ok==='yes').length;
+  const w=weakestOf(rec);
+  $('#v-practice').innerHTML=`
+  <div class="card pad" style="text-align:center;padding:40px 24px">
+    <div class="big" style="color:var(--plum)">${good}<small>/${deck.length}</small></div>
+    <h2 style="font-size:24px;margin:14px 0 8px">${good>=deck.length*0.7?'Good session.':'Worth doing again tomorrow.'}</h2>
+    <p class="hint" style="max-width:52ch;margin:0 auto 20px">${esc(rec.name.split(' ')[0])} worked through ${done.length} of ${deck.length} exercises on ${w.name.toLowerCase()}. ${good>=deck.length*0.7?'Set the full rewrite next — the habit is there, it needs a whole script to prove it.':'Repeat the ones marked "not yet" before moving on. Two exercises done properly beat ten rushed.'}</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" onclick="PRAC.i=0;drawPractice()">Go through it again</button>
+      <button class="btn ghost" onclick="openReport('${rec.id}')">Back to the report</button>
+      <button class="btn ghost" onclick="printWorksheet('${rec.id}')">Print as a worksheet</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- paper version, for a class without devices ---------- */
+function printWorksheet(id){
+  const rec=RECORDS.find(r=>r.id===id); if(!rec) return;
+  const deck=buildDeck(rec), w=weakestOf(rec);
+  const win=window.open('','_blank');
+  if(!win) return toast('Allow pop-ups to print the worksheet');
+  win.document.write(`<meta charset="utf-8"><title>Repair sheet — ${esc(rec.name)}</title>
+  <style>body{font-family:Georgia,serif;max-width:720px;margin:36px auto;padding:0 20px;line-height:1.6;color:#111}
+  h1{font-size:22px;margin-bottom:2px} .sub{color:#666;font-size:13px;margin-bottom:22px}
+  .ex{border:1px solid #ccc;border-radius:8px;padding:14px 16px;margin-bottom:16px;page-break-inside:avoid}
+  .g{background:#f4f4f4;padding:8px 10px;border-radius:5px;font-style:italic;margin:8px 0}
+  .lines{border-bottom:1px solid #999;height:26px;margin-top:8px}
+  ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:#444} .k{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.1em}</style>
+  <h1>Repair sheet — ${esc(rec.name)}</h1>
+  <div class="sub">${esc(rec.klass||'')} · SPM Writing ${recTotal(rec)}/60 · working on ${esc(w.name)} · ${new Date().toLocaleDateString('en-GB')}</div>
+  ${deck.map((it,n)=>`<div class="ex"><div class="k">${n+1} · ${esc(it.kind==='fix'?'Correct it':it.kind==='upgrade'?'Rebuild it':'Write it again')}</div>
+    <b>${esc(it.instruction)}</b>
+    ${it.given?`<div class="g">You wrote: ${esc(it.given)}</div>`:''}
+    ${(it.steps||[]).length?`<ul>${it.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${Array.from({length:it.kind==='rewrite'?12:3}).map(()=>'<div class="lines"></div>').join('')}
+    ${(it.criteria||[]).length?`<ul><li><b>It counts when:</b> ${it.criteria.map(x=>esc(x)).join('; ')}</li></ul>`:''}</div>`).join('')}
+  <p style="font-size:13px;color:#666">Marked by ${esc(TEACHER.name)}, ${esc(TEACHER.school)}.</p>`);
+  win.document.close(); win.focus(); setTimeout(()=>win.print(),400);
+}
+
+boot();
+</script>
